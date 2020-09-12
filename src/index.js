@@ -49,6 +49,20 @@ const styles = {
     orangeColor: {
       color: "#ff5733"
     },
+    correctAnswer: {
+      backgroundColor: '#8FE6C5',
+    },
+    correctOption: {
+      backgroundColor: '#36f443',
+      color: 'white'
+    },
+    uncorrectAnswer: {
+      backgroundColor: '#F08080',
+    },
+    uncorrectOption: {
+      backgroundColor: '#ff3d00',
+      color: 'white'
+    },
     button: {
       backgroundColor: '#30445C',
       color: "#ff5733",

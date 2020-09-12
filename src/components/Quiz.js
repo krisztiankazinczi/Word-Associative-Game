@@ -105,7 +105,6 @@ const Quiz = ({ classes }) => {
               Select the most related word to the first 3 ones!
             </h3>
             <div className={classes.quizWords}>
-              {/* <h3>{currentQuestion + 1} / 10:</h3> */}
               {quizQuestions[currentQuestion].quiz.map((word, idx) => (
                 <h3 key={idx}>{word}</h3>
               ))}
