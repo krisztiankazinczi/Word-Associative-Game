@@ -23,10 +23,16 @@ const styles = {
       dark: "#35919d",
       contrastText: "#fff",
     },
+    tertiary: {
+      light: "#ff785b",
+      main: "#ff5733",
+      dark: "#b23c23",
+      contrastText: "#fff",
+    },
   },
   otherStyles: {
     mainBacgroundColor: {
-      backgroundColor: "#2F4459",
+      backgroundColor: "rgb(23,34,44)",
     },
     secondaryBackgroundColor: {
       backgroundColor: '#30445C',
@@ -36,6 +42,14 @@ const styles = {
     },
     selectedColor: {
       backgroundColor: "#E78230",
+    },
+    button: {
+      backgroundColor: '#30445C',
+      '&:hover': {
+        background: "#3c5573",
+        transition: "100ms transform ease-in",
+        transform: "scale(1.08)"
+     }
     }
   }
 };

@@ -38,7 +38,7 @@ const styles = (theme) => ({
     marginTop: '20px;'
   },
   textColor: {
-    color: "#d500f9"
+    color: "#9BA8B5"
   }
 });
 
