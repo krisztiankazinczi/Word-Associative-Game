@@ -31,11 +31,14 @@ const styles = {
     },
   },
   otherStyles: {
-    mainBacgroundColor: {
+    mainBackgroundColor: {
       backgroundColor: "rgb(23,34,44)",
     },
     secondaryBackgroundColor: {
       backgroundColor: '#30445C',
+    },
+    secondaryBackgroundColorHovered: {
+      backgroundColor: '#3c5573',
     },
     mainTextColor: {
       color: '#9BA8B5',
@@ -43,8 +46,13 @@ const styles = {
     selectedColor: {
       backgroundColor: "#E78230",
     },
+    orangeColor: {
+      color: "#ff5733"
+    },
     button: {
       backgroundColor: '#30445C',
+      color: "#ff5733",
+      cursor: "pointer",
       '&:hover': {
         background: "#3c5573",
         transition: "100ms transform ease-in",

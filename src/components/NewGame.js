@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import withStyles from "@material-ui/core/styles/withStyles";
 
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -13,7 +14,71 @@ import { newGame } from "../store/actions";
 
 import "./NewGame.css";
 
-function NewGame() {
+const styles = (theme) => ({
+  ...theme.otherStyles,
+  button: {
+    ...theme.otherStyles.button,
+    fontSize: "35px",
+    padding: "10px 30px",
+    borderRadius: "10px",
+  },
+  modeContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  options: {
+    display: "flex",
+    width: "50%",
+    alignItems: "center",
+    "& > h2": {
+      fontSize: "36px",
+      color: theme.otherStyles.orangeColor.color,
+      fontWeight: 700,
+      flex: 0.5,
+    },
+  },
+  dropDown: {
+    flex: 0.5,
+    color: theme.otherStyles.orangeColor.color,
+    "&:before": {
+      borderColor: theme.otherStyles.orangeColor.color,
+    },
+    "&:after": {
+      borderColor: theme.otherStyles.orangeColor.color,
+    },
+    "&:hover:not(.Mui-disabled):before": {
+      borderColor: theme.otherStyles.orangeColor.color,
+    },
+    // '&.MuiList-padding': {
+    //   paddingTop: 0,
+    //   paddingBottom: 0
+    // }
+  },
+  icon: {
+    fill: theme.otherStyles.orangeColor.color,
+  },
+  halfWidth: {
+    width: "50%",
+  },
+  menuItem: {
+    color: theme.otherStyles.orangeColor.color,
+    backgroundColor: theme.otherStyles.secondaryBackgroundColor.backgroundColor,
+    '&:hover': {
+      background: theme.otherStyles.secondaryBackgroundColorHovered.backgroundColor,
+    },
+    '&.Mui-selected': {
+      background: theme.otherStyles.secondaryBackgroundColor.backgroundColor,
+    },
+    '&.Mui-selected:hover': {
+      background: theme.otherStyles.secondaryBackgroundColorHovered.backgroundColor,
+    }
+  },
+});
+
+function NewGame({ classes }) {
   const [area, setArea] = useState("sat");
   const [level, setLevel] = useState(5);
   const [redirectToQuiz, setRedirectToQuiz] = useState(false);
@@ -63,14 +128,14 @@ function NewGame() {
   };
 
   const startMultiGame = async () => {
-    const response = await fetch("http://localhost:3030/getRoomID")
-    const res = await response.json()
-    if (typeof res === 'string') {
-      setRoomID(res)
-      setRedirectToRoom(true)
+    const response = await fetch("http://localhost:3030/getRoomID");
+    const res = await response.json();
+    if (typeof res === "string") {
+      setRoomID(res);
+      setRedirectToRoom(true);
     }
     //error Handling...
-  }
+  };
 
   const selectGameMode = (event) => {
     const gameMode = event.target.getAttribute("data-value");
@@ -92,19 +157,29 @@ function NewGame() {
       <Redirect
         to={{
           pathname: `/room/${roomID}`,
-          state: { area, level }
+          state: { area, level },
         }}
       />
-    )
+    );
   }
 
   if (!mode) {
     return (
-      <div className="newGame__modeContainer">
-        <h2 data-value="single" onClick={(e) => selectGameMode(e)}>
+      <div
+        className={`${classes.modeContainer} ${classes.mainBackgroundColor}`}
+      >
+        <h2
+          data-value="single"
+          className={classes.button}
+          onClick={(e) => selectGameMode(e)}
+        >
           Single Player
         </h2>
-        <h2 data-value="multi" onClick={(e) => selectGameMode(e)}>
+        <h2
+          data-value="multi"
+          className={classes.button}
+          onClick={(e) => selectGameMode(e)}
+        >
           Multiplayer
         </h2>
       </div>
@@ -112,32 +187,38 @@ function NewGame() {
   }
 
   return (
-    <div className="newGame__settingsContainer">
-      <div className="newGame__category">
+    <div className={`${classes.modeContainer} ${classes.mainBackgroundColor}`}>
+      <div className={classes.options}>
         <h2>Category</h2>
         <Select
           name="area"
           value={area}
           onChange={(e) => setArea(e.target.value)}
-          className="newGame__dropDown"
+          className={classes.dropDown}
+          inputProps={{classes: {
+            icon: classes.icon
+          }}}
         >
           {categories.map((cat) => (
-            <MenuItem key={cat} className="newGame__menuItem" value={cat}>
+            <MenuItem key={cat} className={classes.menuItem} value={cat}>
               {cat.toUpperCase()}
             </MenuItem>
           ))}
         </Select>
       </div>
-      <div className="newGame__level">
+      <div className={classes.options}>
         <h2>Level</h2>
         <Select
           name="level"
           value={level}
           onChange={(e) => setLevel(e.target.value)}
-          className="newGame__dropDown"
+          className={classes.dropDown}
+          inputProps={{classes: {
+            icon: classes.icon
+          }}}
         >
           {levels.map((level) => (
-            <MenuItem key={level} className="newGame__menuItem" value={level}>
+            <MenuItem key={level} className={classes.menuItem} value={level}>
               {level}
             </MenuItem>
           ))}
@@ -146,83 +227,20 @@ function NewGame() {
 
       <Button
         size="large"
-        className="newGame__button"
+        className={`${classes.button} ${classes.halfWidth}`}
         variant="contained"
-        onClick={mode === 'single' ? startSingleGame : mode === 'multi' ? startMultiGame : ''}
+        onClick={
+          mode === "single"
+            ? startSingleGame
+            : mode === "multi"
+            ? startMultiGame
+            : ""
+        }
       >
         <Typography variant="h5">Start</Typography>
       </Button>
     </div>
   );
-
-  /*
-  return (
-    <Grid
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justify="center"
-      style={{ minHeight: "100vh", backgroundColor: "#511845" }}
-    >
-      <Grid item xs={3} container style={{ color: "#ff5733" }} spacing={4}>
-        <Grid item xs={6}>
-          <Typography variant="h4">Category</Typography>
-        </Grid>
-        <Grid item xs={6} className="newGame__inputContainer">
-          <Select
-            name="area"
-            value={area}
-            onChange={(e) => setArea(e.target.value)}
-            className="newGame__dropDown"
-          >
-            {categories.map((cat) => (
-              <MenuItem key={cat} className="newGame__menuItem" value={cat}>
-                {cat.toUpperCase()}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-
-        <Grid item xs={6}>
-          <Typography variant="h4">Level</Typography>
-        </Grid>
-        <Grid item xs={6}>
-          <Select
-            name="level"
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            className="newGame__dropDown"
-          >
-            {levels.map((level) => (
-              <MenuItem key={level} className="newGame__menuItem" value={level}>
-                {level}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          container
-          alignItems="center"
-          className="newGame__inputContainer"
-        >
-          <Button
-            size="large"
-            className="newGame__button"
-            style={{ backgroundColor: "#900c3f" }}
-            variant="contained"
-            onClick={startGame}
-          >
-            <Typography style={{ color: "#ff5733" }} variant="h5">
-              Start
-            </Typography>
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>
-  );*/
 }
 
-export default NewGame;
+export default withStyles(styles)(NewGame);
