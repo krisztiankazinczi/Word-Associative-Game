@@ -1,1 +1,1 @@
-# Word-Associative-Game
+# Word-Associative-Quiz-Game
