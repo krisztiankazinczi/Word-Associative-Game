@@ -51,7 +51,7 @@ const StartPage = ({ classes }) => {
       direction="column"
       alignItems="center"
       justify="center"
-      className={`${classes.mainBacgroundColor} ${classes.fullHeight}`}
+      className={`${classes.mainBackgroundColor} ${classes.fullHeight}`}
     >
       <Grid item xs={3}>
         <Button

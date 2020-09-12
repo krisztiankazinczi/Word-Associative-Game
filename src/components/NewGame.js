@@ -14,11 +14,13 @@ import { newGame } from "../store/actions";
 
 import "./NewGame.css";
 
+import axios from '../axios';
+
 const styles = (theme) => ({
   ...theme.otherStyles,
   button: {
     ...theme.otherStyles.button,
-    fontSize: "35px",
+    fontSize: "30px",
     padding: "10px 30px",
     borderRadius: "10px",
   },
@@ -41,6 +43,7 @@ const styles = (theme) => ({
     },
   },
   dropDown: {
+    fontSize: '26px',
     flex: 0.5,
     color: theme.otherStyles.orangeColor.color,
     "&:before": {
@@ -105,33 +108,25 @@ function NewGame({ classes }) {
 
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-  const startSingleGame = () => {
-    fetch(
-      `https://twinword-word-association-quiz.p.rapidapi.com/type1/?area=${area}&level=${level}`,
-      {
-        method: "GET",
-        headers: {
-          "x-rapidapi-host": "twinword-word-association-quiz.p.rapidapi.com",
-          "x-rapidapi-key":
-            "5e1990fcb7msh1cd4491b7cf3c1ap17a83fjsn4f69b58c7396",
-        },
-      }
-    )
-      .then((resp) => resp.json())
-      .then((res) => {
-        dispatch(newGame(res.quizlist));
-        setRedirectToQuiz(true);
-      })
-      .catch((err) => {
-        console.log(err);
+  const startSingleGame = async () => {
+    try {
+      const response = await axios.post("/newSingleGame", {
+        area,
+        level
       });
+      dispatch(newGame(response.data.quizlist));
+      setRedirectToQuiz(true);
+    } catch (error) {
+      console.log(error)
+      // Error handling
+    }
+  
   };
 
   const startMultiGame = async () => {
-    const response = await fetch("http://localhost:3030/getRoomID");
-    const res = await response.json();
-    if (typeof res === "string") {
-      setRoomID(res);
+    const response = await axios.get("/getRoomID");
+    if (typeof response.data === "string") {
+      setRoomID(response.data);
       setRedirectToRoom(true);
     }
     //error Handling...

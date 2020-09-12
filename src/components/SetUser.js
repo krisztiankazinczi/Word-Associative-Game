@@ -19,8 +19,8 @@ const styles = (theme) => ({
   dialogActions: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#30445C',
-    color: '#9BA8B5',
+    backgroundColor: theme.otherStyles.secondaryBackgroundColor.backgroundColor,
+    color: theme.otherStyles.mainTextColor.color,
     overflow: 'hidden'
   },
   inputContainer: {
@@ -37,8 +37,17 @@ const styles = (theme) => ({
   marginTop: {
     marginTop: '20px;'
   },
-  textColor: {
-    color: "#9BA8B5"
+  inputColor: {
+    color: theme.otherStyles.mainTextColor.color,
+    "&:before": {
+      borderColor: theme.palette.primary.main,
+    },
+    "&:after": {
+      borderColor: theme.palette.primary.main,
+    },
+    "&:hover:not(.Mui-disabled):before": {
+      borderColor: theme.palette.primary.main,
+    }
   }
 });
 
@@ -67,7 +76,7 @@ const SetUser = ({ open, setOpen, classes }) => {
       <DialogTitle className={classes.dialogActions}>Please select your username:</DialogTitle>
       <DialogActions className={classes.dialogActions}>
         <div className={classes.inputContainer}>
-          <Input className={`${classes.center} ${classes.textColor}`} fullWidth color="secondary" type="text" value={userName} onKeyDown={(e) => handleSubmit(e)} onChange={(e) => setUserName(e.target.value)} />
+          <Input className={`${classes.center} ${classes.inputColor}`} fullWidth color="secondary" type="text" value={userName} onKeyDown={(e) => handleSubmit(e)} onChange={(e) => setUserName(e.target.value)} />
         </div>
         <div className={`${classes.inputContainer} ${classes.marginTop}`}>
           <Button className={classes.center} onClick={() => setOpen(false)} color="primary">
