@@ -23,7 +23,7 @@ const styles = {
       dark: "#35919d",
       contrastText: "#fff",
     },
-    tertiary: {
+    warning: {
       light: "#ff785b",
       main: "#ff5733",
       dark: "#b23c23",

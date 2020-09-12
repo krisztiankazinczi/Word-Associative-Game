@@ -55,12 +55,19 @@ const SetUser = ({ open, setOpen, classes }) => {
     setOpen(false)
   };
 
+  const handleSubmit = (e) => {
+    if (e.key === 'Enter') {
+      dispatch(setUser(userName));
+      setOpen(false)
+    }
+  }
+
   return (
     <Dialog className={classes.dialog} open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
       <DialogTitle className={classes.dialogActions}>Please select your username:</DialogTitle>
       <DialogActions className={classes.dialogActions}>
         <div className={classes.inputContainer}>
-          <Input className={`${classes.center} ${classes.textColor}`} fullWidth color="secondary" type="text" value={userName} onChange={(e) => setUserName(e.target.value)} />
+          <Input className={`${classes.center} ${classes.textColor}`} fullWidth color="secondary" type="text" value={userName} onKeyDown={(e) => handleSubmit(e)} onChange={(e) => setUserName(e.target.value)} />
         </div>
         <div className={`${classes.inputContainer} ${classes.marginTop}`}>
           <Button className={classes.center} onClick={() => setOpen(false)} color="primary">
