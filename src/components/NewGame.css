@@ -1,0 +1,101 @@
+.newGame__modeContainer,
+.newGame__settingsContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background-color: #511845;
+}
+
+.newGame__modeContainer > h2 {
+  font-size: 38px;
+  color: #ff5733;
+  background-color: #900c3f;
+  cursor: pointer;
+  padding: 10px 30px;
+  border-radius: 10px;
+}
+
+.newGame__modeContainer > h2:hover {
+  transition: 100ms transform ease-in;
+  transform: scale(1.08);
+}
+
+.newGame__category,
+.newGame__level {
+  display: flex;
+  width: 50%;
+  align-items: center;
+}
+
+.newGame__category > h2,
+.newGame__level > h2 {
+  font-size: 36px;
+  color: #ff5733;
+  font-weight: 700;
+  flex: 0.5;
+}
+
+.newGame__dropDown {
+  flex: 0.5;
+}
+
+.MuiInput-underline:before {
+  border-bottom: 1px solid #ff5733 !important;
+}
+
+.MuiInput-underline:before {
+  border-bottom: 1px solid #ff5733 !important;
+}
+
+.MuiSelect-select.MuiSelect-select {
+  color: #ff5733;
+  font-size: 26px;
+}
+
+.MuiSelect-icon {
+  color: #ff5733 !important;
+}
+
+.MuiMenu-list {
+  background-color: #900c3f;
+  color: #ff5733;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.MuiMenu-list > li {
+  border: 1px solid #ff5733;
+}
+
+.MuiMenu-list > li:hover {
+  background-color: #560725;
+}
+
+
+
+/* .newGame__inputContainer {
+  width: 30%;
+} */
+
+.newGame__dropDown {
+  width: 100% !important;
+}
+
+button.newGame__button {
+  width: 50%;
+  margin-top: 5vh;
+  background-color: #900c3f;
+}
+
+button.newGame__button:hover {
+  background-color: #900c3f;
+  transition: 100ms transform ease-in;
+  transform: scale(1.08);
+}
+
+button.newGame__button > span > h5 {
+  font-size: 30px;
+  color: #ff5733;
+}
