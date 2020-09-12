@@ -6,6 +6,8 @@ const io = require("socket.io")(server);
 const cors = require("cors");
 const fetch = require("node-fetch");
 const dotenv = require("dotenv");
+dotenv.config({ path: "./config.env" });
+
 
 const clientURL = "http://localhost:3000/newGame";
 
@@ -70,9 +72,6 @@ server.listen(port);
 
 // HELPER FUNCTIONS
 const getQuizQuestions = async (area, level) => {
-  dotenv.config({ path: "./config.env" });
-
-
   let API_URL;
 
   API_URL = process.env.API_URL.replace("<area>", area);

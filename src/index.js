@@ -58,6 +58,9 @@ const styles = {
         transition: "100ms transform ease-in",
         transform: "scale(1.08)"
      }
+    },
+    halfWidth: {
+      width: '50%'
     }
   }
 };
