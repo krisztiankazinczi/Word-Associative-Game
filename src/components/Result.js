@@ -40,16 +40,16 @@ const styles = (theme) => ({
 });
 
 function Result({ classes }) {
-  const [{ quizQuestions }] = useStateValue();
+  const [{ quiz }] = useStateValue();
 
-  if (!quizQuestions || !isGameFinished(quizQuestions)) {
+  if (!quiz?.quizQuestions || !isGameFinished(quiz?.quizQuestions)) {
     return <Redirect to="/quiz" />;
   }
 
   return (
     <div className={classes.result}>
       <div className={classes.row}>
-        <h2>Total Score: {getTotalScore(quizQuestions)} / 10</h2>
+        <h2>Total Score: {getTotalScore(quiz.quizQuestions)} / 10</h2>
         <Link to="/newGame" className={classes.link}>
           <Button size="large" className={classes.button} variant="contained">
             <Typography className={classes.text} variant="h5">
@@ -58,7 +58,7 @@ function Result({ classes }) {
           </Button>
         </Link>
       </div>
-      {quizQuestions.map((question, id) => (
+      {quiz.quizQuestions.map((question, id) => (
         <ResultRow
           key={id}
           userAnswer={question.answer}

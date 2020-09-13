@@ -2,7 +2,7 @@ import { NEW_GAME, FINISH_GAME, ANSWER_QUESTION, SET_USER, SET_GAME_MODE, SAVE_E
 
 export const initialState = {
   username: '',
-  quizQuestions: null,
+  quiz: null,
   currentQuestion: 0,
   currentGameMode: '',
 };
@@ -13,35 +13,39 @@ const reducer = (state, action) => {
       return { ...state, username: action.payload}
 
     case NEW_GAME:
-      return { ...state, quizQuestions: action.payload };
+      return { ...state, quiz: {...state.quiz, quizQuestions: action.payload}};
 
     case SET_GAME_MODE:
       return { ...state, currentGameMode: action.payload }
 
     case FINISH_GAME:
-      return { ...state, quizQuestions: null };
+      return { ...state, quiz: null };
 
     case ANSWER_QUESTION:
       return {
         ...state,
         currentQuestion: state.currentQuestion === 9 ? state.currentQuestion : (state.currentQuestion + 1),
-        quizQuestions: [
-          ...state.quizQuestions.slice(0, action.payload.questionNumber),
-          Object.assign(
-            {},
-            state.quizQuestions[action.payload.questionNumber],
-            {
-              answer: action.payload.answer,
-            }
-          ),
-          ...state.quizQuestions.slice(action.payload.questionNumber + 1),
-        ],
+        quiz: {
+          ...state.quiz,
+          quizQuestions: [
+            ...state.quiz.quizQuestions.slice(0, action.payload.questionNumber),
+            Object.assign(
+              {},
+              state.quiz.quizQuestions[action.payload.questionNumber],
+              {
+                answer: action.payload.answer,
+              }
+            ),
+            ...state.quiz.quizQuestions.slice(action.payload.questionNumber + 1),
+          ],
+        }
+        
       };
 
       case SAVE_EVERYONES_ANSWER:
         return {
           ...state,
-          
+
         }
 
     default:

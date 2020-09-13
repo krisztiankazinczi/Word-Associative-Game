@@ -77,7 +77,7 @@ const ENDPOINT = "http://localhost:3030";
 
 const Quiz = ({ classes }) => {
   const [
-    { quizQuestions, currentQuestion, currentGameMode, username },
+    { quiz, currentQuestion, currentGameMode, username },
     dispatch,
   ] = useStateValue();
   const [finished, setFinished] = useState(false); // finished game in SinglePLayer mode or finished my game in multiPlayer mode
@@ -111,12 +111,12 @@ const Quiz = ({ classes }) => {
   };
 
   // redirect if the user comes to this page without starting a newGame or did not have a saved game
-  if (!quizQuestions) {
+  if (!quiz?.quizQuestions) {
     return <Redirect to="/newGame" />;
   }
 
   const submitAnswersToServer = () => {
-      const myAnswers = collectAllAnswers(quizQuestions);
+      const myAnswers = collectAllAnswers(quiz.quizQuestions);
       const socket = socketIOClient(ENDPOINT);
       socket.emit(
         "submit-answers",
@@ -149,12 +149,12 @@ const Quiz = ({ classes }) => {
               Select the most related word to the first 3 ones!
             </h3>
             <div className={classes.quizWords}>
-              {quizQuestions[currentQuestion].quiz.map((word, idx) => (
+              {quiz.quizQuestions[currentQuestion].quiz.map((word, idx) => (
                 <h3 key={idx}>{word}</h3>
               ))}
             </div>
             <div className={classes.quizOptions}>
-              {quizQuestions[currentQuestion].option.map((option, idx) => (
+              {quiz.quizQuestions[currentQuestion].option.map((option, idx) => (
                 <h3
                   className={classes.button}
                   key={idx}
