@@ -4,7 +4,7 @@ export const initialState = {
   username: '',
   quiz: null,
   currentQuestion: 0,
-  currentGameMode: '',
+  currentGameMode: null,
 };
 
 const reducer = (state, action) => {
@@ -45,7 +45,7 @@ const reducer = (state, action) => {
       case SAVE_EVERYONES_ANSWER:
         return {
           ...state,
-
+          quiz: {...state.quiz, playersAnswers: action.payload}
         }
 
     default:

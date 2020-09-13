@@ -72,24 +72,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("submit-answers", (roomId, username, answers) => {
-    console.log('answers' in games[roomId].players[username])
     if (!('answers' in games[roomId].players[username])) {
       games[roomId].players[username].answers = answers;
     }
-    console.log(roomId, username, answers);
     // check if everyone finished the quiz
     let everyoneFinished = true;
 
     Object.keys(games[roomId].players).forEach(username => {
-      console.log(username)
       if (!games[roomId].players[username].answers) {
-        console.log('mikor jovok be ide?')
         everyoneFinished = false;
       }
     });
 
     if (everyoneFinished) {
-      socket.to(roomId).broadcast.emit("quiz-finished", games[roomId].players);
+      const formattedAnswers = rearrangeResultsObject(games[roomId].players)
+      socket.to(roomId).broadcast.emit("quiz-finished", formattedAnswers);
     }
   })
 
@@ -121,3 +118,15 @@ const getQuizQuestions = async (area, level) => {
 
   return data;
 };
+
+const rearrangeResultsObject = (result) => {
+  const answers = []
+  for (let i = 0; i < 10; i++) {
+    const questionIndex = {}
+    Object.entries(result).forEach(([key, value]) => {
+      questionIndex[key] = value.answers[i]
+    })
+    answers.push(questionIndex)
+  }
+  return answers
+}

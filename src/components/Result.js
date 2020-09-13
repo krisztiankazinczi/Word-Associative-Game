@@ -40,7 +40,10 @@ const styles = (theme) => ({
 });
 
 function Result({ classes }) {
-  const [{ quiz }] = useStateValue();
+  const [{ quiz, currentGameMode : { gameMode } }] = useStateValue();
+
+  console.log(quiz.playersAnswers)
+
 
   if (!quiz?.quizQuestions || !isGameFinished(quiz?.quizQuestions)) {
     return <Redirect to="/quiz" />;
@@ -65,6 +68,7 @@ function Result({ classes }) {
           correctAnswer={question.correct}
           options={question.option}
           words={question.quiz}
+          otherAnswers={ gameMode === 'multiPlayer' ? quiz.playersAnswers[id] : false}
         />
       ))}
     </div>

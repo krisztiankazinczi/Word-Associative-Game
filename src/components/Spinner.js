@@ -9,7 +9,7 @@ const Spinner = () => {
       color="#ff5733"
       height={100}
       width={100}
-      timeout={30000}
+      timeout={60000}
     />
   );
 }

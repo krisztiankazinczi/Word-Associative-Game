@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import "./Quiz.css";
 
 import { useStateValue } from "../store/StateProvider";
-import { answerQuestion } from "../store/actions";
+import { answerQuestion, saveEveryonesAnswers } from "../store/actions";
 import { Redirect, Link } from "react-router-dom";
 
 import socketIOClient from "socket.io-client";
@@ -71,6 +71,27 @@ const styles = (theme) => ({
     color: theme.otherStyles.orangeColor.color,
     fontWeight: 500,
   },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '& > h3': {
+      fontSize: '25px',
+      fontWeight: 500,
+      marginTop: '25px',
+      color: theme.otherStyles.mainTextColor.color
+    },
+    '& > h3:first-child': {
+      color: theme.otherStyles.orangeColor.color
+    }
+  },
+  button: {
+    ...theme.otherStyles.button,
+    fontSize: '25px',
+    padding: '10px',
+    borderRadius: '3px'
+  }
 });
 
 const ENDPOINT = "http://localhost:3030";
@@ -82,6 +103,7 @@ const Quiz = ({ classes }) => {
   ] = useStateValue();
   const [finished, setFinished] = useState(false); // finished game in SinglePLayer mode or finished my game in multiPlayer mode
   const [multiFinished, setMultiFinished] = useState(false); // when server informs us, that everyone finished the game or the time limit passed
+  const [submittedAnswers, setSubmittedAnswers] = useState(false);
 
   useEffect(() => {
     if (currentGameMode.gameMode === 'singlePlayer') return;
@@ -91,6 +113,8 @@ const Quiz = ({ classes }) => {
     socket.emit("join-room", currentGameMode.roomId, username);
 
     socket.on("quiz-finished", (gameResult) => {
+      console.log(gameResult);
+      dispatch(saveEveryonesAnswers(gameResult))
       setMultiFinished(true);
     });
 
@@ -124,6 +148,7 @@ const Quiz = ({ classes }) => {
         username,
         myAnswers
       );
+      setSubmittedAnswers(true);
   };
 
   return (
@@ -135,8 +160,14 @@ const Quiz = ({ classes }) => {
             <Link to="/result">Check Result</Link>
           </div>
         ) : finished && currentGameMode.gameMode === "multiPlayer" ? (
-          <div>
-            <button onClick={submitAnswersToServer}>Send</button>
+          <div className={classes.container}>
+            {
+              !submittedAnswers ? (
+                <button className={classes.button} onClick={submitAnswersToServer}>Send</button>
+              ) : (
+                <h3>Answers sent to server</h3>
+              )
+            }
             <h3>Waiting for other players....</h3>
             <Spinner />
           </div>

@@ -2,6 +2,8 @@ import React from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
 
+import { useStateValue } from "../store/StateProvider";
+
 const styles = (theme) => ({
   ...theme.otherStyles,
   resultsRow: {
@@ -22,49 +24,75 @@ const styles = (theme) => ({
     padding: "5px",
     borderRadius: "2px",
     marginRight: "10px",
-    marginTop: '5px',
-    marginBottom: '5px'
+    marginTop: "5px",
+    marginBottom: "5px",
   },
   wordsColor: {
     backgroundColor: theme.otherStyles.secondaryBackgroundColor.backgroundColor,
-    color: 'white',
+    color: "white",
   },
 });
 
-function ResultRow({ userAnswer, correctAnswer, options, words, classes }) {
+const ResultRow = ({
+  userAnswer,
+  correctAnswer,
+  options,
+  words,
+  otherAnswers,
+  classes,
+}) => {
+  const [{ quiz }] = useStateValue();
+
+  console.log(otherAnswers)
+
   return (
-    <div
-      className={clsx(
-        classes.resultsRow,
-        userAnswer === correctAnswer
-          ? classes.correctAnswer
-          : classes.uncorrectAnswer
+    <div>
+      <div
+        className={clsx(
+          classes.resultsRow,
+          userAnswer === correctAnswer
+            ? classes.correctAnswer
+            : classes.uncorrectAnswer
+        )}
+      >
+        <div className={classes.wordContainer}>
+          {words.map((word, id) => (
+            <h2 key={word} className={clsx(classes.words, classes.wordsColor)}>
+              {word}
+            </h2>
+          ))}
+        </div>
+        <div className={classes.wordContainer}>
+          {options.map((option, id) => (
+            <h2
+              key={option}
+              className={clsx(
+                classes.words,
+                id + 1 === correctAnswer
+                  ? classes.correctOption
+                  : classes.uncorrectOption
+              )}
+            >
+              {option}
+            </h2>
+          ))}
+        </div>
+      </div>
+      {otherAnswers && (
+        <div>
+          {
+            Object.entries(otherAnswers).map(([username, answer]) => (
+              <div>
+                <h3>
+                  {username}: {answer}
+                </h3>
+              </div>
+            ))
+          }
+        </div>
       )}
-    >
-      <div className={classes.wordContainer}>
-        {words.map((word, id) => (
-          <h2 key={word} className={clsx(classes.words, classes.wordsColor)}>
-            {word}
-          </h2>
-        ))}
-      </div>
-      <div className={classes.wordContainer}>
-        {options.map((option, id) => (
-          <h2
-            key={option}
-            className={clsx(
-              classes.words,
-              id + 1 === correctAnswer
-                ? classes.correctOption
-                : classes.uncorrectOption
-            )}
-          >
-            {option}
-          </h2>
-        ))}
-      </div>
     </div>
   );
-}
+};
 
 export default withStyles(styles)(ResultRow);
