@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
 
@@ -7,6 +7,12 @@ import "./Quiz.css";
 import { useStateValue } from "../store/StateProvider";
 import { answerQuestion } from "../store/actions";
 import { Redirect, Link } from "react-router-dom";
+
+import socketIOClient from "socket.io-client";
+
+import { collectAllAnswers } from "../store/selectors";
+
+import Spinner from "./Spinner";
 
 const styles = (theme) => ({
   ...theme.otherStyles,
@@ -64,12 +70,32 @@ const styles = (theme) => ({
   quizQuestionNumber: {
     color: theme.otherStyles.orangeColor.color,
     fontWeight: 500,
-  }
+  },
 });
 
+const ENDPOINT = "http://localhost:3030";
+
 const Quiz = ({ classes }) => {
-  const [{ quizQuestions, currentQuestion }, dispatch] = useStateValue();
-  const [finished, setFinished] = useState(false);
+  const [
+    { quizQuestions, currentQuestion, currentGameMode, username },
+    dispatch,
+  ] = useStateValue();
+  const [finished, setFinished] = useState(false); // finished game in SinglePLayer mode or finished my game in multiPlayer mode
+  const [multiFinished, setMultiFinished] = useState(false); // when server informs us, that everyone finished the game or the time limit passed
+
+  useEffect(() => {
+    if (currentGameMode.gameMode === 'singlePlayer') return;
+
+    const socket = socketIOClient(ENDPOINT);
+
+    socket.emit("join-room", currentGameMode.roomId, username);
+
+    socket.on("quiz-finished", (gameResult) => {
+      setMultiFinished(true);
+    });
+
+    return () => socket.disconnect();
+  }, []);
 
   const selectAnswer = (event) => {
     const questionNumber = parseInt(
@@ -89,17 +115,35 @@ const Quiz = ({ classes }) => {
     return <Redirect to="/newGame" />;
   }
 
+  const submitAnswersToServer = () => {
+      const myAnswers = collectAllAnswers(quizQuestions);
+      const socket = socketIOClient(ENDPOINT);
+      socket.emit(
+        "submit-answers",
+        currentGameMode.roomId,
+        username,
+        myAnswers
+      );
+  };
+
   return (
     <div className={classes.quiz}>
       <div className={classes.halfWidth}>
-        {finished ? (
+        {(finished && currentGameMode.gameMode === "singlePlayer") ||
+        multiFinished ? (
           <div className={classes.quizFinished}>
             <Link to="/result">Check Result</Link>
+          </div>
+        ) : finished && currentGameMode.gameMode === "multiPlayer" ? (
+          <div>
+            <button onClick={submitAnswersToServer}>Send</button>
+            <h3>Waiting for other players....</h3>
+            <Spinner />
           </div>
         ) : (
           <div>
             <Typography variant="h3" className={classes.quizQuestionNumber}>
-            {currentQuestion + 1} / 10
+              {currentQuestion + 1} / 10
             </Typography>
             <h3 className={classes.quizInfo}>
               Select the most related word to the first 3 ones!

@@ -27,8 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 app.post("/api/v1/newSingleGame", async (req, res) => {
   const { area, level } = req.body;
 
-  const data = await getQuizQuestions(area, level)
-  res.status(200).json({ quizlist: data.quizlist})
+  const data = await getQuizQuestions(area, level);
+
+  res.status(200).json({ quizlist: data.quizlist, gameMode: 'singlePlayer'})
 
 });
 
@@ -45,24 +46,52 @@ app.get("/api/v1/getRoomID", (req, res) => {
 const games = {};
 
 io.on("connection", (socket) => {
-  socket.on("join-room", (roomId, userId) => {
+  socket.on("join-room", (roomId, username) => {
     //this connects the user to the room
     socket.join(roomId);
     // this just emit a new event: user-connected
     if (!games[roomId]) {
-      games[roomId] = [userId];
+      games[roomId] = {};
+      games[roomId].players = {};
+      games[roomId].players[username] = {}
     } else {
-      if (!games[roomId].includes(userId)) {
-        games[roomId].push(userId);
+      const usernames = Object.keys(games[roomId].players)
+      if (!usernames.includes(username)) {
+        games[roomId].players[username] = {}
       }
     }
-    socket.to(roomId).broadcast.emit("user-connected", games[roomId]);
+    socket.to(roomId).broadcast.emit("user-connected", games[roomId].players);
   });
 
   socket.on("startGame", async (roomId, area, level) => {
     const data = await getQuizQuestions(area, level);
-    socket.to(roomId).broadcast.emit("quiz-list", data.quizlist);
+    //save the quiz details to roomId
+    games[roomId].quiz = data.quizlist;
+    //send all the questions to the participants
+    socket.to(roomId).broadcast.emit("quiz-list", data.quizlist, "multiPlayer");
   });
+
+  socket.on("submit-answers", (roomId, username, answers) => {
+    console.log('answers' in games[roomId].players[username])
+    if (!('answers' in games[roomId].players[username])) {
+      games[roomId].players[username].answers = answers;
+    }
+    console.log(roomId, username, answers);
+    // check if everyone finished the quiz
+    let everyoneFinished = true;
+
+    Object.keys(games[roomId].players).forEach(username => {
+      console.log(username)
+      if (!games[roomId].players[username].answers) {
+        console.log('mikor jovok be ide?')
+        everyoneFinished = false;
+      }
+    });
+
+    if (everyoneFinished) {
+      socket.to(roomId).broadcast.emit("quiz-finished", games[roomId].players);
+    }
+  })
 
   socket.on("disconnect", () => {});
 });
@@ -70,7 +99,7 @@ io.on("connection", (socket) => {
 server.listen(port);
 
 
-// HELPER FUNCTIONS
+// FETCH DATA FROM RAPIDAPI
 const getQuizQuestions = async (area, level) => {
   let API_URL;
 

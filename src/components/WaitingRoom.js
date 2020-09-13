@@ -12,7 +12,7 @@ import SetUser from "./SetUser";
 import socketIOClient from "socket.io-client";
 import { useStateValue } from "../store/StateProvider";
 
-import { newGame } from "../store/actions";
+import { newGame, setGameMode } from "../store/actions";
 import { Typography } from "@material-ui/core";
 
 const ENDPOINT = "http://localhost:3030";
@@ -87,11 +87,17 @@ const WaitingRoom = ({
     const socket = socketIOClient(ENDPOINT);
     socket.emit("join-room", roomID, username);
 
-    socket.on("user-connected", (userIds) => {
-      setPlayers(userIds);
+    socket.on("user-connected", (users) => {
+      const usernames = Object.keys(users)
+      setPlayers(usernames);
     });
 
-    socket.on("quiz-list", (quizlist) => {
+    socket.on("quiz-list", (quizlist, gameMode) => {
+      const mode = {
+        gameMode,
+        roomId: roomID
+      }
+      dispatch(setGameMode(mode));
       dispatch(newGame(quizlist));
       setRedirectToQuiz(true);
     });
@@ -118,6 +124,7 @@ const WaitingRoom = ({
       <Redirect
         to={{
           pathname: "/quiz",
+          state: { roomID },
         }}
       />
     );

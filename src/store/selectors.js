@@ -21,3 +21,9 @@ export const getTotalScore = (quizQuestions) => {
 
   return totalScore;
 }
+
+export const collectAllAnswers = (quizQuestions) => {
+  const answers = quizQuestions.map(question => question.answer);
+  console.log(answers);
+  return answers;
+}

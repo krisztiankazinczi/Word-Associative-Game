@@ -1,9 +1,16 @@
-import { NEW_GAME, FINISH_GAME, ANSWER_QUESTION, SET_USER } from "./action_types"
+import { NEW_GAME, FINISH_GAME, ANSWER_QUESTION, SET_USER, SET_GAME_MODE, SAVE_EVERYONES_ANSWER } from "./action_types"
 
 export const newGame = (payload) => {
   //payload contains all the fetched quizQuestions
   return {
     type: NEW_GAME,
+    payload
+  }
+}
+
+export const setGameMode = (payload) => {
+  return {
+    type: SET_GAME_MODE,
     payload
   }
 }
@@ -18,6 +25,14 @@ export const answerQuestion = (payload) => {
   // payload is an answer to a question
   return {
     type: ANSWER_QUESTION,
+    payload
+  }
+}
+
+export const saveEveryonesAnswers = (payload) => {
+  //payload contains all the participants's answers in a multiPlayer room
+  return {
+    type: SAVE_EVERYONES_ANSWER,
     payload
   }
 }

@@ -1,9 +1,10 @@
-import { NEW_GAME, FINISH_GAME, ANSWER_QUESTION, SET_USER } from "./action_types";
+import { NEW_GAME, FINISH_GAME, ANSWER_QUESTION, SET_USER, SET_GAME_MODE, SAVE_EVERYONES_ANSWER } from "./action_types";
 
 export const initialState = {
   username: '',
   quizQuestions: null,
   currentQuestion: 0,
+  currentGameMode: '',
 };
 
 const reducer = (state, action) => {
@@ -13,6 +14,9 @@ const reducer = (state, action) => {
 
     case NEW_GAME:
       return { ...state, quizQuestions: action.payload };
+
+    case SET_GAME_MODE:
+      return { ...state, currentGameMode: action.payload }
 
     case FINISH_GAME:
       return { ...state, quizQuestions: null };
@@ -33,6 +37,12 @@ const reducer = (state, action) => {
           ...state.quizQuestions.slice(action.payload.questionNumber + 1),
         ],
       };
+
+      case SAVE_EVERYONES_ANSWER:
+        return {
+          ...state,
+          
+        }
 
     default:
       return state;

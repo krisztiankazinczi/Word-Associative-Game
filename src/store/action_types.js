@@ -1,7 +1,11 @@
 export const NEW_GAME = "NEW_GAME"
 
+export const SET_GAME_MODE = "SET_GAME_MODE"
+
 export const FINISH_GAME = "FINISH_GAME"
 
 export const ANSWER_QUESTION = "ANSWER_QUESTION"
+
+export const SAVE_EVERYONES_ANSWER = "SAVE_EVERYONES_ANSWER"
 
 export const SET_USER = "SET_USER"

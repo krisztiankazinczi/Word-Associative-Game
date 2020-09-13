@@ -10,7 +10,7 @@ import { Redirect } from "react-router-dom";
 
 import { useStateValue } from "../store/StateProvider";
 
-import { newGame } from "../store/actions";
+import { newGame, setGameMode } from "../store/actions";
 
 import "./NewGame.css";
 
@@ -114,6 +114,11 @@ function NewGame({ classes }) {
         area,
         level
       });
+      const mode = {
+        gameMode: response.data.gameMode,
+        roomId: 'none'
+      }
+      dispatch(setGameMode(mode));
       dispatch(newGame(response.data.quizlist));
       setRedirectToQuiz(true);
     } catch (error) {
