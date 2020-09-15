@@ -5,8 +5,6 @@ import clsx from 'clsx';
 
 import { Redirect } from "react-router-dom";
 
-import "./WaitingRoom.css";
-
 import SetUser from "./SetUser";
 
 import socketIOClient from "socket.io-client";

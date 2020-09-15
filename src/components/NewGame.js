@@ -12,8 +12,6 @@ import { useStateValue } from "../store/StateProvider";
 
 import { newGame, setGameMode } from "../store/actions";
 
-import "./NewGame.css";
-
 import axios from '../axios';
 
 const styles = (theme) => ({

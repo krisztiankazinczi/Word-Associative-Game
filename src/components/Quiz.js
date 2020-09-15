@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
 
-import "./Quiz.css";
-
 import { useStateValue } from "../store/StateProvider";
 import { answerQuestion, saveEveryonesAnswers } from "../store/actions";
 import { Redirect, Link } from "react-router-dom";
