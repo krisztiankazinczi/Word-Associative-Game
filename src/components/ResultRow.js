@@ -2,10 +2,14 @@ import React from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
 
-import { useStateValue } from "../store/StateProvider";
+import CheckIcon from "@material-ui/icons/Check";
+import ClearIcon from "@material-ui/icons/Clear";
 
 const styles = (theme) => ({
   ...theme.otherStyles,
+  container: {
+    width: '100%',
+  },
   resultsRow: {
     display: "flex",
     alignItems: "center",
@@ -14,6 +18,8 @@ const styles = (theme) => ({
     padding: "5px",
     borderRadius: "5px",
     width: "60%",
+    marginLeft: 'auto',
+    marginRight: 'auto'
   },
   wordContainer: {
     display: "flex",
@@ -31,6 +37,50 @@ const styles = (theme) => ({
     backgroundColor: theme.otherStyles.secondaryBackgroundColor.backgroundColor,
     color: "white",
   },
+  answerContainer: {
+    marginTop: "5px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: '20%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    '& > div': {
+      width: '100%'
+    }
+  },
+  spaces: {
+    margin: 0,
+    padding: "5px",
+  },
+  playerName: {
+    fontSize: "24px",
+    color: theme.otherStyles.mainTextColor.color,
+    padding: '5px'
+  },
+  correctBorder: {
+    border: "2px solid",
+    borderColor: theme.otherStyles.correctAnswer.backgroundColor,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  incorrectBorder: {
+    border: "2px solid",
+    borderColor: theme.otherStyles.incorrectAnswer.backgroundColor,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  correctIcon: {
+    color: theme.otherStyles.correctAnswer.backgroundColor,
+    fontWeight: 700
+  },
+  incorrectIcon: {
+    color: theme.otherStyles.incorrectAnswer.backgroundColor,
+    fontWeight: 700
+  }
 });
 
 const ResultRow = ({
@@ -41,18 +91,14 @@ const ResultRow = ({
   otherAnswers,
   classes,
 }) => {
-  const [{ quiz }] = useStateValue();
-
-  console.log(otherAnswers)
-
   return (
-    <div>
+    <div className={classes.container}>
       <div
         className={clsx(
           classes.resultsRow,
           userAnswer === correctAnswer
             ? classes.correctAnswer
-            : classes.uncorrectAnswer
+            : classes.incorrectAnswer
         )}
       >
         <div className={classes.wordContainer}>
@@ -70,7 +116,7 @@ const ResultRow = ({
                 classes.words,
                 id + 1 === correctAnswer
                   ? classes.correctOption
-                  : classes.uncorrectOption
+                  : classes.incorrectOption
               )}
             >
               {option}
@@ -79,16 +125,23 @@ const ResultRow = ({
         </div>
       </div>
       {otherAnswers && (
-        <div>
-          {
-            Object.entries(otherAnswers).map(([username, answer]) => (
-              <div>
-                <h3>
-                  {username}: {answer}
-                </h3>
-              </div>
-            ))
-          }
+        <div className={classes.answerContainer}>
+          {Object.entries(otherAnswers).map(([username, answer]) => (
+            <div
+              className={
+                (answer === correctAnswer
+                  ? classes.correctBorder
+                  : classes.incorrectBorder)
+              }
+            >
+              <h3 className={clsx(classes.playerName, classes.spaces)}>{username}:</h3>
+              {answer === correctAnswer ? (
+                <CheckIcon className={clsx(classes.correctIcon, classes.spaces)} />
+              ) : (
+                <ClearIcon className={clsx(classes.incorrectIcon, classes.spaces)} />
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

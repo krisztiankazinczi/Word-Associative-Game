@@ -1,7 +1,15 @@
-import { NEW_GAME, FINISH_GAME, ANSWER_QUESTION, SET_USER, SET_GAME_MODE, SAVE_EVERYONES_ANSWER } from "./action_types";
+import {
+  NEW_GAME,
+  FINISH_GAME,
+  ANSWER_QUESTION,
+  SET_USER,
+  SET_GAME_MODE,
+  SAVE_EVERYONES_ANSWER,
+  DELETE_DATA_FROM_STORE,
+} from "./action_types";
 
 export const initialState = {
-  username: '',
+  username: "",
   quiz: null,
   currentQuestion: 0,
   currentGameMode: null,
@@ -10,13 +18,16 @@ export const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case SET_USER:
-      return { ...state, username: action.payload}
+      return { ...state, username: action.payload };
 
     case NEW_GAME:
-      return { ...state, quiz: {...state.quiz, quizQuestions: action.payload}};
+      return {
+        ...state,
+        quiz: { ...state.quiz, quizQuestions: action.payload },
+      };
 
     case SET_GAME_MODE:
-      return { ...state, currentGameMode: action.payload }
+      return { ...state, currentGameMode: action.payload };
 
     case FINISH_GAME:
       return { ...state, quiz: null };
@@ -24,7 +35,10 @@ const reducer = (state, action) => {
     case ANSWER_QUESTION:
       return {
         ...state,
-        currentQuestion: state.currentQuestion === 9 ? state.currentQuestion : (state.currentQuestion + 1),
+        currentQuestion:
+          state.currentQuestion === 9
+            ? state.currentQuestion
+            : state.currentQuestion + 1,
         quiz: {
           ...state.quiz,
           quizQuestions: [
@@ -36,17 +50,26 @@ const reducer = (state, action) => {
                 answer: action.payload.answer,
               }
             ),
-            ...state.quiz.quizQuestions.slice(action.payload.questionNumber + 1),
+            ...state.quiz.quizQuestions.slice(
+              action.payload.questionNumber + 1
+            ),
           ],
-        }
-        
+        },
       };
 
-      case SAVE_EVERYONES_ANSWER:
-        return {
-          ...state,
-          quiz: {...state.quiz, playersAnswers: action.payload}
-        }
+    case SAVE_EVERYONES_ANSWER:
+      return {
+        ...state,
+        quiz: { ...state.quiz, playersAnswers: action.payload },
+      };
+
+    case DELETE_DATA_FROM_STORE:
+      return {
+        ...state,
+        quiz: null,
+        currentQuestion: 0,
+        currentGameMode: null
+      }
 
     default:
       return state;

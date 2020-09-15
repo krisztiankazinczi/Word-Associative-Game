@@ -56,10 +56,10 @@ const styles = {
       backgroundColor: '#36f443',
       color: 'white'
     },
-    uncorrectAnswer: {
+    incorrectAnswer: {
       backgroundColor: '#F08080',
     },
-    uncorrectOption: {
+    incorrectOption: {
       backgroundColor: '#ff3d00',
       color: 'white'
     },

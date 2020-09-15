@@ -118,6 +118,7 @@ function NewGame({ classes }) {
         gameMode: response.data.gameMode,
         roomId: 'none'
       }
+      console.log(response.data.quizlist)
       dispatch(setGameMode(mode));
       dispatch(newGame(response.data.quizlist));
       setRedirectToQuiz(true);

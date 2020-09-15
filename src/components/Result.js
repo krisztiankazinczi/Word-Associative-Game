@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { useStateValue } from "../store/StateProvider";
-import { isGameFinished, getTotalScore } from "../store/selectors";
+import {
+  isGameFinished,
+  getTotalScore,
+  getTotalScoreOfEveryone,
+} from "../store/selectors";
+import { deleteDataFromStore } from "../store/actions";
 
 import { Link, Redirect } from "react-router-dom";
 
@@ -17,33 +22,42 @@ const styles = (theme) => ({
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: "20px",
-    "& > div > h2": {
+    "& > div > h2, & > div > div > h2": {
       fontSize: "32px",
-      color: "#ff5733",
+      color: theme.otherStyles.orangeColor.color,
       fontWeight: "900",
     },
   },
   row: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '60%'
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "60%",
   },
   text: {
-    color: "#ff5733",
+    color: theme.otherStyles.orangeColor.color,
   },
   link: {
-    textDecoration: 'none',
-    display: 'block'
-  }
+    textDecoration: "none",
+    display: "block",
+  },
 });
 
 function Result({ classes }) {
-  const [{ quiz, currentGameMode : { gameMode } }] = useStateValue();
+  const [
+    {
+      quiz,
+      currentGameMode: { gameMode },
+    },
+    dispatch,
+  ] = useStateValue();
 
-  console.log(quiz.playersAnswers)
-
+  useEffect(() => {
+    return () => {
+      dispatch(deleteDataFromStore());
+    };
+  });
 
   if (!quiz?.quizQuestions || !isGameFinished(quiz?.quizQuestions)) {
     return <Redirect to="/quiz" />;
@@ -52,7 +66,19 @@ function Result({ classes }) {
   return (
     <div className={classes.result}>
       <div className={classes.row}>
-        <h2>Total Score: {getTotalScore(quiz.quizQuestions)} / 10</h2>
+        {gameMode === "singlePlayer" ? (
+          <h2>Total Score: {getTotalScore(quiz.quizQuestions)} / 10</h2>
+        ) : (
+          <div>
+            {Object.entries(
+              getTotalScoreOfEveryone(quiz.quizQuestions, quiz.playersAnswers)
+            ).map(([username, totalScore], id) => (
+              <h2 key={id}>
+                {username}: {totalScore} / 10
+              </h2>
+            ))}
+          </div>
+        )}
         <Link to="/newGame" className={classes.link}>
           <Button size="large" className={classes.button} variant="contained">
             <Typography className={classes.text} variant="h5">
@@ -68,7 +94,9 @@ function Result({ classes }) {
           correctAnswer={question.correct}
           options={question.option}
           words={question.quiz}
-          otherAnswers={ gameMode === 'multiPlayer' ? quiz.playersAnswers[id] : false}
+          otherAnswers={
+            gameMode === "multiPlayer" ? quiz.playersAnswers[id] : false
+          }
         />
       ))}
     </div>
