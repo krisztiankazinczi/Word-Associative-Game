@@ -11,7 +11,7 @@ dotenv.config({ path: "./config.env" });
 
 const clientURL = "http://localhost:3000/newGame";
 
-const port = 3030;
+const port = process.env.PORT || 3030;
 
 const corsOptions = {
   origin: clientURL,
