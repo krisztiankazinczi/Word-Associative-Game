@@ -10,9 +10,15 @@ import {
 
 export const initialState = {
   username: "",
-  quiz: null,
+  quiz: {
+    quizQuestions: null,
+    playersAnswers: null
+  },
   currentQuestion: 0,
-  currentGameMode: null,
+  currentGameMode: {
+    gameMode: '',
+    roomId: ''
+  }
 };
 
 const reducer = (state, action) => {

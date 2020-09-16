@@ -60,14 +60,14 @@ const styles = (theme) => ({
     padding: '5px'
   },
   correctBorder: {
-    border: "2px solid",
+    border: "3px solid",
     borderColor: theme.otherStyles.correctAnswer.backgroundColor,
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
   },
   incorrectBorder: {
-    border: "2px solid",
+    border: "3px solid",
     borderColor: theme.otherStyles.incorrectAnswer.backgroundColor,
     display: 'flex',
     justifyContent: 'space-between',

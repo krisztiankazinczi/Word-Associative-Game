@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import copy from "copy-to-clipboard";
 import clsx from 'clsx';
+import Button from "@material-ui/core/Button";
 
 import { Redirect } from "react-router-dom";
 
@@ -36,6 +37,7 @@ const styles = (theme) => ({
     fontSize: "25px",
     padding: "10px",
     borderRadius: "3px",
+    textTransform: 'capitalize'
   },
   copyInfo: {
     display: "flex",
@@ -135,9 +137,9 @@ const WaitingRoom = ({
         Send this link to invite others: <span>{`${url}${roomID}`}</span>
       </h3>
       <div className={classes.copyInfo}>
-        <button className={classes.button} onClick={copyURL}>
+        <Button variant="contained" className={classes.button} onClick={copyURL}>
           Copy Link to Clipboard
-        </button>
+        </Button>
         {copySuccess && <h3 className={classes.copiedText}>URL Copied</h3>}
       </div>
       <div className={classes.playersContainer}>
@@ -146,9 +148,9 @@ const WaitingRoom = ({
         ))}
       </div>
       {players[0] === username && (
-        <button className={clsx(classes.button, classes.marginTop)} onClick={startGame}>
+        <Button variant="contained" className={clsx(classes.button, classes.marginTop)} onClick={startGame}>
           Start Game
-        </button>
+        </Button>
       )}
     </div>
   );
