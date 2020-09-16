@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/Word-Associative-Quiz-Game/static/css/main.5f361e03.chunk.css",
+    "main.js": "/Word-Associative-Quiz-Game/static/js/main.e19cb66b.chunk.js",
+    "main.js.map": "/Word-Associative-Quiz-Game/static/js/main.e19cb66b.chunk.js.map",
+    "runtime-main.js": "/Word-Associative-Quiz-Game/static/js/runtime-main.2d73c243.js",
+    "runtime-main.js.map": "/Word-Associative-Quiz-Game/static/js/runtime-main.2d73c243.js.map",
+    "static/css/2.f87e9f44.chunk.css": "/Word-Associative-Quiz-Game/static/css/2.f87e9f44.chunk.css",
+    "static/js/2.0c391e99.chunk.js": "/Word-Associative-Quiz-Game/static/js/2.0c391e99.chunk.js",
+    "static/js/2.0c391e99.chunk.js.map": "/Word-Associative-Quiz-Game/static/js/2.0c391e99.chunk.js.map",
+    "index.html": "/Word-Associative-Quiz-Game/index.html",
+    "precache-manifest.9f3fd057060b127a0d3cc69784dc6f71.js": "/Word-Associative-Quiz-Game/precache-manifest.9f3fd057060b127a0d3cc69784dc6f71.js",
+    "service-worker.js": "/Word-Associative-Quiz-Game/service-worker.js",
+    "static/css/2.f87e9f44.chunk.css.map": "/Word-Associative-Quiz-Game/static/css/2.f87e9f44.chunk.css.map",
+    "static/css/main.5f361e03.chunk.css.map": "/Word-Associative-Quiz-Game/static/css/main.5f361e03.chunk.css.map",
+    "static/js/2.0c391e99.chunk.js.LICENSE.txt": "/Word-Associative-Quiz-Game/static/js/2.0c391e99.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.2d73c243.js",
+    "static/css/2.f87e9f44.chunk.css",
+    "static/js/2.0c391e99.chunk.js",
+    "static/css/main.5f361e03.chunk.css",
+    "static/js/main.e19cb66b.chunk.js"
+  ]
+}
