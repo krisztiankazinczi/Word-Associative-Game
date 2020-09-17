@@ -82,6 +82,7 @@ const styles = (theme) => ({
 function NewGame({ classes }) {
   const [area, setArea] = useState("sat");
   const [level, setLevel] = useState(5);
+  const [timeLimit, setTimeLimit] = useState(30)
   const [redirectToQuiz, setRedirectToQuiz] = useState(false);
   const [mode, setMode] = useState(""); // single or multi
   const [redirectToRoom, setRedirectToRoom] = useState(false);
@@ -105,6 +106,8 @@ function NewGame({ classes }) {
   ];
 
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  const times = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
 
   const startSingleGame = async () => {
     try {
@@ -155,7 +158,7 @@ function NewGame({ classes }) {
       <Redirect
         to={{
           pathname: `/room/${roomID}`,
-          state: { area, level },
+          state: { area, level, timeLimit },
         }}
       />
     );
@@ -218,6 +221,24 @@ function NewGame({ classes }) {
           {levels.map((level) => (
             <MenuItem key={level} className={classes.menuItem} value={level}>
               {level}
+            </MenuItem>
+          ))}
+        </Select>
+      </div>
+      <div className={classes.options}>
+        <h2>Timelimit</h2>
+        <Select
+          name="timeLimit"
+          value={timeLimit}
+          onChange={(e) => setTimeLimit(e.target.value)}
+          className={classes.dropDown}
+          inputProps={{classes: {
+            icon: classes.icon
+          }}}
+        >
+          {times.map((t) => (
+            <MenuItem key={t} className={classes.menuItem} value={t}>
+              {t} s
             </MenuItem>
           ))}
         </Select>

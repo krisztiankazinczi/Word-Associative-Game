@@ -80,6 +80,7 @@ const WaitingRoom = ({
   //These came with Redirect props, but only for the room creator!!!
   const area = props.location.state?.area;
   const level = props.location.state?.level;
+  const timeLimit = props.location.state?.timeLimit;
 
   useEffect(() => {
     if (!username) return;
@@ -92,10 +93,12 @@ const WaitingRoom = ({
       setPlayers(usernames);
     });
 
-    socket.on("quiz-list", (quizlist, gameMode) => {
+    socket.on("quiz-list", (quizlist, gameMode, createdAt, timeLimit) => {
       const mode = {
         gameMode,
-        roomId: roomID
+        roomId: roomID,
+        createdAt,
+        timeLimit
       }
       dispatch(setGameMode(mode));
       dispatch(newGame(quizlist));
@@ -107,7 +110,7 @@ const WaitingRoom = ({
 
   const startGame = () => {
     const socket = socketIOClient(ENDPOINT);
-    socket.emit("startGame", roomID, area, level);
+    socket.emit("startGame", roomID, area, level, timeLimit);
   };
 
   const copyURL = () => {

@@ -63,15 +63,25 @@ io.on("connection", (socket) => {
     socket.to(roomId).broadcast.emit("user-connected", games[roomId].players);
   });
 
-  socket.on("startGame", async (roomId, area, level) => {
+  socket.on("startGame", async (roomId, area, level, timeLimit) => {
     const data = await getQuizQuestions(area, level);
     //save the quiz details to roomId
     games[roomId].quiz = data.quizlist;
+    games[roomId].createdAt = new Date()
+    games[roomId].timeLimit = timeLimit
     //send all the questions to the participants
-    socket.to(roomId).broadcast.emit("quiz-list", data.quizlist, "multiPlayer");
+    socket.to(roomId).broadcast.emit("quiz-list", data.quizlist, "multiPlayer", games[roomId].createdAt, games[roomId].timeLimit);
+    setTimeout(() => {
+      if (!games[roomId].everyoneFinished) {
+        // if everyone finished the game, the results won't be sent after 1 min
+        const formattedAnswers = rearrangeResultsObject(games[roomId].players)
+        socket.to(roomId).broadcast.emit("quiz-finished", formattedAnswers);
+      }
+    }, (timeLimit * 1000))
   });
 
   socket.on("submit-answers", (roomId, username, answers) => {
+    console.log(answers)
     if (!('answers' in games[roomId].players[username])) {
       games[roomId].players[username].answers = answers;
     }
@@ -85,6 +95,7 @@ io.on("connection", (socket) => {
     });
 
     if (everyoneFinished) {
+      games[roomId].everyoneFinished = true
       const formattedAnswers = rearrangeResultsObject(games[roomId].players)
       socket.to(roomId).broadcast.emit("quiz-finished", formattedAnswers);
     }
@@ -120,13 +131,25 @@ const getQuizQuestions = async (area, level) => {
 };
 
 const rearrangeResultsObject = (result) => {
+  /**
+   * result: {
+   *    username1: {
+   *      answers: [num1, num2, num3, ... num10]
+   *    },
+   *    username2: { answers: [...]}
+   * }
+   */
+  console.log(result);
   const answers = []
   for (let i = 0; i < 10; i++) {
     const questionIndex = {}
     Object.entries(result).forEach(([key, value]) => {
-      questionIndex[key] = value.answers[i]
+      if (Object.keys(value).length) {
+        questionIndex[key] = value.answers[i] 
+      }
     })
     answers.push(questionIndex)
   }
+  // if nobody sent back the answers to the server then answers will be an Array of 10 empty objects
   return answers
 }

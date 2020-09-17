@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 
 import { useStateValue } from "../store/StateProvider";
 import { answerQuestion, saveEveryonesAnswers } from "../store/actions";
@@ -70,27 +71,40 @@ const styles = (theme) => ({
     fontWeight: 500,
   },
   container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    '& > h3': {
-      fontSize: '25px',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    "& > h3": {
+      fontSize: "25px",
       fontWeight: 500,
-      marginTop: '25px',
-      color: theme.otherStyles.mainTextColor.color
+      marginTop: "25px",
+      color: theme.otherStyles.mainTextColor.color,
     },
-    '& > h3:first-child': {
-      color: theme.otherStyles.orangeColor.color
-    }
+    "& > h3:first-child": {
+      color: theme.otherStyles.orangeColor.color,
+    },
   },
   button: {
     ...theme.otherStyles.button,
-    fontSize: '25px',
-    padding: '10px',
-    borderRadius: '3px'
-  }
+    fontSize: "25px",
+    padding: "10px",
+    borderRadius: "3px",
+    textTransform: "capitalized",
+  },
 });
+
+const countDownInitialValue = (currentGameMode) => {
+  if (currentGameMode.createdAt) {
+    const now = Date.now();
+    const createdAtconverted = new Date(currentGameMode.createdAt)
+    const gameEnd = createdAtconverted.getTime() + (currentGameMode.timeLimit * 1000)
+    
+    const remainingTime = Math.floor((gameEnd - now) / 1000)
+    return remainingTime;
+  }
+  return null;
+};
 
 const ENDPOINT = "http://localhost:3030";
 
@@ -99,12 +113,18 @@ const Quiz = ({ classes }) => {
     { quiz, currentQuestion, currentGameMode, username },
     dispatch,
   ] = useStateValue();
+
   const [finished, setFinished] = useState(false); // finished game in SinglePLayer mode or finished my game in multiPlayer mode
   const [multiFinished, setMultiFinished] = useState(false); // when server informs us, that everyone finished the game or the time limit passed
   const [submittedAnswers, setSubmittedAnswers] = useState(false);
+  const [countDown, setCountDown] = useState(countDownInitialValue(currentGameMode));
 
   useEffect(() => {
-    if (currentGameMode.gameMode === 'singlePlayer') return;
+    if (currentGameMode.gameMode === "singlePlayer") return;
+
+    const interval = setInterval(() => {
+      setCountDown((countDown) => countDown - 1);
+    }, 1000);
 
     const socket = socketIOClient(ENDPOINT);
 
@@ -112,12 +132,36 @@ const Quiz = ({ classes }) => {
 
     socket.on("quiz-finished", (gameResult) => {
       console.log(gameResult);
-      dispatch(saveEveryonesAnswers(gameResult))
+      dispatch(saveEveryonesAnswers(gameResult));
       setMultiFinished(true);
     });
 
-    return () => socket.disconnect();
+    return () => {
+      clearInterval(interval);
+      socket.disconnect();
+    };
   }, []);
+
+  useEffect(() => {
+    if (currentGameMode.gameMode === "singlePlayer") return;
+      if (countDown === 0) {
+        const socket = socketIOClient(ENDPOINT);
+  
+        // socket.emit("join-room", currentGameMode.roomId, username);
+  
+        const myAnswers = collectAllAnswers(quiz.quizQuestions);
+        console.log(myAnswers)
+        socket.emit(
+          "submit-answers",
+          currentGameMode.roomId,
+          username,
+          myAnswers
+        );
+        setSubmittedAnswers(true);
+
+        return () => socket.disconnect();
+      }
+  }, [countDown]);
 
   const selectAnswer = (event) => {
     const questionNumber = parseInt(
@@ -133,20 +177,15 @@ const Quiz = ({ classes }) => {
   };
 
   // redirect if the user comes to this page without starting a newGame or did not have a saved game
-  if (!quiz?.quizQuestions) {
-    return <Redirect to="/newGame" />;
+  if (!quiz.quizQuestions && !username && !currentGameMode.gameMode) {
+    return <Redirect to="/" />;
   }
 
   const submitAnswersToServer = () => {
-      const myAnswers = collectAllAnswers(quiz.quizQuestions);
-      const socket = socketIOClient(ENDPOINT);
-      socket.emit(
-        "submit-answers",
-        currentGameMode.roomId,
-        username,
-        myAnswers
-      );
-      setSubmittedAnswers(true);
+    const myAnswers = collectAllAnswers(quiz.quizQuestions);
+    const socket = socketIOClient(ENDPOINT);
+    socket.emit("submit-answers", currentGameMode.roomId, username, myAnswers);
+    setSubmittedAnswers(true);
   };
 
   return (
@@ -159,21 +198,30 @@ const Quiz = ({ classes }) => {
           </div>
         ) : finished && currentGameMode.gameMode === "multiPlayer" ? (
           <div className={classes.container}>
-            {
-              !submittedAnswers ? (
-                <button className={classes.button} onClick={submitAnswersToServer}>Send</button>
-              ) : (
-                <h3>Answers sent to server</h3>
-              )
-            }
+            {!submittedAnswers ? (
+              <Button
+                variant="contained"
+                className={classes.button}
+                onClick={submitAnswersToServer}
+              >
+                Send
+              </Button>
+            ) : (
+              <h3>Answers sent to server</h3>
+            )}
             <h3>Waiting for other players....</h3>
             <Spinner />
           </div>
         ) : (
           <div>
-            <Typography variant="h3" className={classes.quizQuestionNumber}>
-              {currentQuestion + 1} / 10
-            </Typography>
+            <div>
+              <Typography variant="h3" className={classes.quizQuestionNumber}>
+                {currentQuestion + 1} / 10
+              </Typography>
+              <Typography variant="h3" className={classes.countDown}>
+                {countDown} s
+              </Typography>
+            </div>
             <h3 className={classes.quizInfo}>
               Select the most related word to the first 3 ones!
             </h3>
@@ -184,7 +232,7 @@ const Quiz = ({ classes }) => {
             </div>
             <div className={classes.quizOptions}>
               {quiz.quizQuestions[currentQuestion].option.map((option, idx) => (
-                <h3
+                <button
                   className={classes.button}
                   key={idx}
                   data-question-number={currentQuestion}
@@ -192,7 +240,7 @@ const Quiz = ({ classes }) => {
                   onClick={(e) => selectAnswer(e)}
                 >
                   {option}
-                </h3>
+                </button>
               ))}
             </div>
           </div>

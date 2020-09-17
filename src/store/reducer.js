@@ -17,7 +17,9 @@ export const initialState = {
   currentQuestion: 0,
   currentGameMode: {
     gameMode: '',
-    roomId: ''
+    roomId: '',
+    createdAt: '',
+    timeLimit: null
   }
 };
 
@@ -39,6 +41,7 @@ const reducer = (state, action) => {
       return { ...state, quiz: null };
 
     case ANSWER_QUESTION:
+      console.log(state.quiz.quizQuestions)
       return {
         ...state,
         currentQuestion:
@@ -72,9 +75,16 @@ const reducer = (state, action) => {
     case DELETE_DATA_FROM_STORE:
       return {
         ...state,
-        quiz: null,
+        quiz: {
+          quizQuestions: null,
+          playersAnswers: null
+        },
         currentQuestion: 0,
-        currentGameMode: null
+        currentGameMode: {
+          gameMode: '',
+          roomId: '',
+          createdAt: ''
+        }
       }
 
     default:

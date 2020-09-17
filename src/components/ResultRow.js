@@ -102,7 +102,7 @@ const ResultRow = ({
         )}
       >
         <div className={classes.wordContainer}>
-          {words.map((word, id) => (
+          {words.map((word) => (
             <h2 key={word} className={clsx(classes.words, classes.wordsColor)}>
               {word}
             </h2>
@@ -126,8 +126,9 @@ const ResultRow = ({
       </div>
       {otherAnswers && (
         <div className={classes.answerContainer}>
-          {Object.entries(otherAnswers).map(([username, answer]) => (
+          {Object.entries(otherAnswers).map(([username, answer], id) => (
             <div
+              key={id}
               className={
                 (answer === correctAnswer
                   ? classes.correctBorder
