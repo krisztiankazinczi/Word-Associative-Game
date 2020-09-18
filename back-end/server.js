@@ -8,7 +8,6 @@ const fetch = require("node-fetch");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 
-
 const clientURL = "http://localhost:3000/newGame";
 
 const port = process.env.PORT || 3030;
@@ -29,8 +28,7 @@ app.post("/api/v1/newSingleGame", async (req, res) => {
 
   const data = await getQuizQuestions(area, level);
 
-  res.status(200).json({ quizlist: data.quizlist, gameMode: 'singlePlayer'})
-
+  res.status(200).json({ quizlist: data.quizlist, gameMode: "singlePlayer" });
 });
 
 // app.get("/api/v1/getRoomID", cors(corsOptions), (req, res) => {
@@ -53,11 +51,11 @@ io.on("connection", (socket) => {
     if (!games[roomId]) {
       games[roomId] = {};
       games[roomId].players = {};
-      games[roomId].players[username] = {}
+      games[roomId].players[username] = {};
     } else {
-      const usernames = Object.keys(games[roomId].players)
+      const usernames = Object.keys(games[roomId].players);
       if (!usernames.includes(username)) {
-        games[roomId].players[username] = {}
+        games[roomId].players[username] = {};
       }
     }
     socket.to(roomId).broadcast.emit("user-connected", games[roomId].players);
@@ -67,45 +65,58 @@ io.on("connection", (socket) => {
     const data = await getQuizQuestions(area, level);
     //save the quiz details to roomId
     games[roomId].quiz = data.quizlist;
-    games[roomId].createdAt = new Date()
-    games[roomId].timeLimit = timeLimit
+    games[roomId].createdAt = new Date();
+    games[roomId].timeLimit = timeLimit;
+    games[roomId].area = area;
+    games[roomId].level = level;
+    // before the game starts there is a 4sec countDown
+    const timeLimitWithWaitingTime = timeLimit + 4; 
     //send all the questions to the participants
-    socket.to(roomId).broadcast.emit("quiz-list", data.quizlist, "multiPlayer", games[roomId].createdAt, games[roomId].timeLimit);
+    socket
+      .to(roomId)
+      .broadcast.emit(
+        "quiz-list",
+        data.quizlist,
+        "multiPlayer",
+        games[roomId].createdAt,
+        games[roomId].timeLimit,
+        games[roomId].area,
+        games[roomId].level,
+        timeLimitWithWaitingTime
+      );
     setTimeout(() => {
       if (!games[roomId].everyoneFinished) {
         // if everyone finished the game, the results won't be sent after 1 min
-        const formattedAnswers = rearrangeResultsObject(games[roomId].players)
+        const formattedAnswers = rearrangeResultsObject(games[roomId].players);
         socket.to(roomId).broadcast.emit("quiz-finished", formattedAnswers);
       }
-    }, (timeLimit * 1000))
+    }, timeLimitWithWaitingTime * 1000);
   });
 
   socket.on("submit-answers", (roomId, username, answers) => {
-    console.log(answers)
-    if (!('answers' in games[roomId].players[username])) {
+    if (!("answers" in games[roomId].players[username])) {
       games[roomId].players[username].answers = answers;
     }
     // check if everyone finished the quiz
     let everyoneFinished = true;
 
-    Object.keys(games[roomId].players).forEach(username => {
+    Object.keys(games[roomId].players).forEach((username) => {
       if (!games[roomId].players[username].answers) {
         everyoneFinished = false;
       }
     });
 
     if (everyoneFinished) {
-      games[roomId].everyoneFinished = true
-      const formattedAnswers = rearrangeResultsObject(games[roomId].players)
+      games[roomId].everyoneFinished = true;
+      const formattedAnswers = rearrangeResultsObject(games[roomId].players);
       socket.to(roomId).broadcast.emit("quiz-finished", formattedAnswers);
     }
-  })
+  });
 
   socket.on("disconnect", () => {});
 });
 
 server.listen(port);
-
 
 // FETCH DATA FROM RAPIDAPI
 const getQuizQuestions = async (area, level) => {
@@ -115,16 +126,13 @@ const getQuizQuestions = async (area, level) => {
 
   API_URL = process.env.API_URL.replace("<level>", level);
 
-  const response = await fetch(
-    API_URL,
-    {
-      method: "GET",
-      headers: {
-        "x-rapidapi-host": process.env.X_RAPIDAPI_HOST,
-        "x-rapidapi-key": process.env.X_RAPIDAPI_KEY
-      },
-    }
-  );
+  const response = await fetch(API_URL, {
+    method: "GET",
+    headers: {
+      "x-rapidapi-host": process.env.X_RAPIDAPI_HOST,
+      "x-rapidapi-key": process.env.X_RAPIDAPI_KEY,
+    },
+  });
   const data = await response.json();
 
   return data;
@@ -140,16 +148,16 @@ const rearrangeResultsObject = (result) => {
    * }
    */
   console.log(result);
-  const answers = []
+  const answers = [];
   for (let i = 0; i < 10; i++) {
-    const questionIndex = {}
+    const questionIndex = {};
     Object.entries(result).forEach(([key, value]) => {
       if (Object.keys(value).length) {
-        questionIndex[key] = value.answers[i] 
+        questionIndex[key] = value.answers[i];
       }
-    })
-    answers.push(questionIndex)
+    });
+    answers.push(questionIndex);
   }
   // if nobody sent back the answers to the server then answers will be an Array of 10 empty objects
-  return answers
-}
+  return answers;
+};

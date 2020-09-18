@@ -92,6 +92,14 @@ const styles = (theme) => ({
     borderRadius: "3px",
     textTransform: "capitalized",
   },
+  countDown: {
+    color: theme.otherStyles.orangeColor.color
+  },
+  info: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }
 });
 
 const countDownInitialValue = (currentGameMode) => {
@@ -118,6 +126,7 @@ const Quiz = ({ classes }) => {
   const [multiFinished, setMultiFinished] = useState(false); // when server informs us, that everyone finished the game or the time limit passed
   const [submittedAnswers, setSubmittedAnswers] = useState(false);
   const [countDown, setCountDown] = useState(countDownInitialValue(currentGameMode));
+  const [redirectToResults, setRedirectToResults] = useState(false)
 
   useEffect(() => {
     if (currentGameMode.gameMode === "singlePlayer") return;
@@ -131,9 +140,9 @@ const Quiz = ({ classes }) => {
     socket.emit("join-room", currentGameMode.roomId, username);
 
     socket.on("quiz-finished", (gameResult) => {
-      console.log(gameResult);
       dispatch(saveEveryonesAnswers(gameResult));
-      setMultiFinished(true);
+      setRedirectToResults(true)
+      // setMultiFinished(true);
     });
 
     return () => {
@@ -150,7 +159,6 @@ const Quiz = ({ classes }) => {
         // socket.emit("join-room", currentGameMode.roomId, username);
   
         const myAnswers = collectAllAnswers(quiz.quizQuestions);
-        console.log(myAnswers)
         socket.emit(
           "submit-answers",
           currentGameMode.roomId,
@@ -179,6 +187,10 @@ const Quiz = ({ classes }) => {
   // redirect if the user comes to this page without starting a newGame or did not have a saved game
   if (!quiz.quizQuestions && !username && !currentGameMode.gameMode) {
     return <Redirect to="/" />;
+  }
+
+  if (redirectToResults) {
+    return <Redirect to="/result" />
   }
 
   const submitAnswersToServer = () => {
@@ -214,7 +226,7 @@ const Quiz = ({ classes }) => {
           </div>
         ) : (
           <div>
-            <div>
+            <div className={classes.info}>
               <Typography variant="h3" className={classes.quizQuestionNumber}>
                 {currentQuestion + 1} / 10
               </Typography>
@@ -225,6 +237,7 @@ const Quiz = ({ classes }) => {
             <h3 className={classes.quizInfo}>
               Select the most related word to the first 3 ones!
             </h3>
+            
             <div className={classes.quizWords}>
               {quiz.quizQuestions[currentQuestion].quiz.map((word, idx) => (
                 <h3 key={idx}>{word}</h3>

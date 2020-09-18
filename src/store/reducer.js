@@ -19,7 +19,10 @@ export const initialState = {
     gameMode: '',
     roomId: '',
     createdAt: '',
-    timeLimit: null
+    timeLimit: null,
+    area: '',
+    level: '',
+    timeLimitWithWaitingTime: ''
   }
 };
 
@@ -83,7 +86,11 @@ const reducer = (state, action) => {
         currentGameMode: {
           gameMode: '',
           roomId: '',
-          createdAt: ''
+          createdAt: '',
+          timeLimit: null,
+          area: '',
+          level: '',
+          timeLimitWithWaitingTime: ''
         }
       }
 
