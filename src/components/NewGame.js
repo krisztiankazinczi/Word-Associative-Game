@@ -11,6 +11,7 @@ import { Redirect } from "react-router-dom";
 import { useStateValue } from "../store/StateProvider";
 
 import { newGame, setGameMode } from "../store/actions";
+import Spinner from "./Spinner";
 
 import axios from '../axios';
 
@@ -90,6 +91,7 @@ function NewGame({ classes }) {
   const [mode, setMode] = useState(""); // single or multi
   const [redirectToRoom, setRedirectToRoom] = useState(false);
   const [roomID, setRoomID] = useState("");
+  const [fetching, setFetching] = useState(false)
 
   const [{}, dispatch] = useStateValue();
 
@@ -114,6 +116,7 @@ function NewGame({ classes }) {
 
   const startSingleGame = async () => {
     //fetch data from server
+    setFetching(true)
     try {
       const response = await axios.post("/newSingleGame", {
         area,
@@ -126,6 +129,7 @@ function NewGame({ classes }) {
       //save data from back-end in the store
       dispatch(setGameMode(mode));
       dispatch(newGame(response.data.quizlist));
+      setFetching(false)
       setRedirectToQuiz(true);
     } catch (error) {
       console.log(error)
@@ -136,18 +140,30 @@ function NewGame({ classes }) {
 
   const startMultiGame = async () => {
     // get roomID from back-end
-    const response = await axios.get("/getRoomID");
-    if (typeof response.data === "string") {
-      setRoomID(response.data);
-      setRedirectToRoom(true);
+    try {
+      const response = await axios.get("/getRoomID");
+      if (typeof response.data === "string") {
+        setRoomID(response.data);
+        setRedirectToRoom(true);
+      }
+    } catch (error) {
+      console.log(error)
     }
-    //error Handling...
   };
 
   const selectGameMode = (event) => {
     const gameMode = event.target.getAttribute("data-value");
     setMode(gameMode);
   };
+
+    //show a spinner while data is fetching
+    if (fetching) {
+      return (
+        <div className={classes.spinner}>
+          <Spinner />
+        </div>
+      ) 
+    }
 
   if (redirectToQuiz) {
     return (

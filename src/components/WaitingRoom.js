@@ -16,11 +16,8 @@ import { Typography } from "@material-ui/core";
 
 import Spinner from "./Spinner";
 
-const ENDPOINT = "http://localhost:3030";
-// const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com" // deployed back-end url
-
-const url = "http://localhost:3000/room/";
-
+// const ENDPOINT = "http://localhost:3030";
+const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com" // deployed back-end url
 
 const styles = (theme) => ({
   ...theme.otherStyles,
@@ -35,13 +32,6 @@ const styles = (theme) => ({
     "& > h3 > span": {
       color: theme.otherStyles.orangeColor.color,
     },
-  },
-  spinner: {
-    display: "flex",
-    backgroundColor: theme.otherStyles.mainBackgroundColor.backgroundColor,
-    alignItems: "center",
-    justifyContent: "center",
-    height: '100vh'
   },
   button: {
     ...theme.otherStyles.button,

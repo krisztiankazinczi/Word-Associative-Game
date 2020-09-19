@@ -120,8 +120,8 @@ const countDownInitialValue = (currentGameMode) => {
   return null;
 };
 
-const ENDPOINT = "http://localhost:3030";
-// const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com"
+// const ENDPOINT = "http://localhost:3030";
+const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com"
 
 const Quiz = ({ classes }) => {
   const [
