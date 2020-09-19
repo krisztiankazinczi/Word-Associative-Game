@@ -16,8 +16,8 @@ import { Typography } from "@material-ui/core";
 
 import Spinner from "./Spinner";
 
-// const ENDPOINT = "http://localhost:3030";
-const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com" // deployed back-end url
+const ENDPOINT = "http://localhost:3030";
+// const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com" // deployed back-end url
 
 const styles = (theme) => ({
   ...theme.otherStyles,
