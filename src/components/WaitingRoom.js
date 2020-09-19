@@ -14,8 +14,10 @@ import { useStateValue } from "../store/StateProvider";
 import { newGame, setGameMode } from "../store/actions";
 import { Typography } from "@material-ui/core";
 
-// const ENDPOINT = "http://localhost:3030";
-const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com"
+import Spinner from "./Spinner";
+
+const ENDPOINT = "http://localhost:3030";
+// const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com" // deployed back-end url
 
 const url = "http://localhost:3000/room/";
 
@@ -33,6 +35,13 @@ const styles = (theme) => ({
     "& > h3 > span": {
       color: theme.otherStyles.orangeColor.color,
     },
+  },
+  spinner: {
+    display: "flex",
+    backgroundColor: theme.otherStyles.mainBackgroundColor.backgroundColor,
+    alignItems: "center",
+    justifyContent: "center",
+    height: '100vh'
   },
   button: {
     ...theme.otherStyles.button,
@@ -98,14 +107,15 @@ const WaitingRoom = ({
   },
   ...props
 }) => {
-  const [{ username, currentGameMode }, dispatch] = useStateValue();
+  const [{ username, currentGameMode }, dispatch] = useStateValue(); // values from store
   const [players, setPlayers] = useState([username]);
   const [open, setOpen] = useState(true); // dialog if user has no username in the store
   const [redirectToQuiz, setRedirectToQuiz] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [countDown, setCountDown] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
-  //These came with Redirect props, but only for the room creator!!!
+  //These came with Redirect props, but only for the room creator!!! These data needed to start the game
   const area = props.location.state?.area;
   const level = props.location.state?.level;
   const timeLimit = props.location.state?.timeLimit;
@@ -120,7 +130,6 @@ const WaitingRoom = ({
       const usernames = Object.keys(users);
       setPlayers(usernames);
     });
-
     socket.on(
       "quiz-list",
       (
@@ -144,12 +153,14 @@ const WaitingRoom = ({
         dispatch(setGameMode(mode));
         dispatch(newGame(quizlist));
         setCountDown(parseInt(timeLimitWithWaitingTime) - parseInt(timeLimit))
+        setFetching(false);
       }
     );
 
     return () => socket.disconnect();
   }, [players.length, username]);
 
+  // start the countDown after the game creator clicked on start game button
   useEffect(() => {
     if (countDown !== false) {
       const interval = setInterval(() => {
@@ -164,19 +175,22 @@ const WaitingRoom = ({
   }, [countDown])
 
   const startGame = () => {
+    setFetching(true) // show spinner
     const socket = socketIOClient(ENDPOINT);
+    //emit event with all the game settings to server to start a multiPlayer game 
     socket.emit("startGame", roomID, area, level, timeLimit);
   };
 
+  //it copies the url of the multiplayer room to the clipboard
   const copyURL = () => {
-    copy(`${url}${roomID}`);
+    copy(window.location.href);
     setCopySuccess(true);
   };
 
   if (!username) {
     return <SetUser open={open} setOpen={setOpen} />;
   }
-
+  // if the game data came from server and the countDown reached 0, this will redirects us to the Quiz
   if (redirectToQuiz) {
     return (
       <Redirect
@@ -188,13 +202,23 @@ const WaitingRoom = ({
     );
   }
 
+  //show a spinner while data is fetching
+  if (fetching) {
+    return (
+      <div className={classes.spinner}>
+        <Spinner />
+      </div>
+    ) 
+  }
+
   return (
     <div>
+      {/* Only the game creator can start the game. Everone see all the joined players to room */}
       {countDown === false ? (
         <div className={classes.waitingRoom}>
           <Typography variant="h3">Welcome in the waiting room!</Typography>
           <h3>
-            Send this link to invite others: <span>{`${url}${roomID}`}</span>
+            Send this link to invite others: <span>{window.location.href}</span>
           </h3>
           <div className={classes.copyInfo}>
             <Button
@@ -222,6 +246,7 @@ const WaitingRoom = ({
           )}
         </div>
       ) : (
+        // If the players got the data from server after the host started the game, a countDown starts at everyone
         <div className={classes.countDown}>
           <div className={classes.gameInfo}>
             <Typography variant="h4">Category: {currentGameMode.area}</Typography>
@@ -236,4 +261,5 @@ const WaitingRoom = ({
   );
 };
 
+//connect to Material UI Theme Provider
 export default withStyles(styles)(WaitingRoom);

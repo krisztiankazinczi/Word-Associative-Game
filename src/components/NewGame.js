@@ -14,6 +14,9 @@ import { newGame, setGameMode } from "../store/actions";
 
 import axios from '../axios';
 
+// needed to modify some Material UI css style
+import './NewGame.css'
+
 const styles = (theme) => ({
   ...theme.otherStyles,
   button: {
@@ -53,10 +56,10 @@ const styles = (theme) => ({
     "&:hover:not(.Mui-disabled):before": {
       borderColor: theme.otherStyles.orangeColor.color,
     },
-    // '&.MuiList-padding': {
-    //   paddingTop: 0,
-    //   paddingBottom: 0
-    // }
+  },
+  '.MuiList-padding':{
+    paddingTop: 0,
+    paddingBottom: 0
   },
   icon: {
     fill: theme.otherStyles.orangeColor.color,
@@ -107,9 +110,10 @@ function NewGame({ classes }) {
 
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-  const times = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
+  const times = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90];
 
   const startSingleGame = async () => {
+    //fetch data from server
     try {
       const response = await axios.post("/newSingleGame", {
         area,
@@ -119,6 +123,7 @@ function NewGame({ classes }) {
         gameMode: response.data.gameMode,
         roomId: 'none'
       }
+      //save data from back-end in the store
       dispatch(setGameMode(mode));
       dispatch(newGame(response.data.quizlist));
       setRedirectToQuiz(true);
@@ -130,6 +135,7 @@ function NewGame({ classes }) {
   };
 
   const startMultiGame = async () => {
+    // get roomID from back-end
     const response = await axios.get("/getRoomID");
     if (typeof response.data === "string") {
       setRoomID(response.data);
@@ -166,6 +172,7 @@ function NewGame({ classes }) {
 
   if (!mode) {
     return (
+      // first the player need to select the game mode. Once it does, this will disappear
       <div
         className={`${classes.modeContainer} ${classes.mainBackgroundColor}`}
       >
@@ -188,6 +195,7 @@ function NewGame({ classes }) {
   }
 
   return (
+    // controlled select fields - to select the game options
     <div className={`${classes.modeContainer} ${classes.mainBackgroundColor}`}>
       <div className={classes.options}>
         <h2>Category</h2>
@@ -225,25 +233,28 @@ function NewGame({ classes }) {
           ))}
         </Select>
       </div>
-      <div className={classes.options}>
-        <h2>Timelimit</h2>
-        <Select
-          name="timeLimit"
-          value={timeLimit}
-          onChange={(e) => setTimeLimit(e.target.value)}
-          className={classes.dropDown}
-          inputProps={{classes: {
-            icon: classes.icon
-          }}}
-        >
-          {times.map((t) => (
-            <MenuItem key={t} className={classes.menuItem} value={t}>
-              {t} s
-            </MenuItem>
-          ))}
-        </Select>
-      </div>
-
+      {/* timeLimit option available for multiplayer games only */}
+      {mode === 'multi' && 
+        <div className={classes.options}>
+          <h2>Timelimit</h2>
+          <Select
+            name="timeLimit"
+            value={timeLimit}
+            onChange={(e) => setTimeLimit(e.target.value)}
+            className={classes.dropDown}
+            inputProps={{classes: {
+              icon: classes.icon
+            }}}
+          >
+            {times.map((t) => (
+              <MenuItem key={t} className={classes.menuItem} value={t}>
+                {t} s
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      }
+  {/* this button will start the game (either multi or single) according to the previously selected mode option */}
       <Button
         size="large"
         className={`${classes.button} ${classes.halfWidth}`}
@@ -262,4 +273,5 @@ function NewGame({ classes }) {
   );
 }
 
+//connect to Material UI Theme Provider
 export default withStyles(styles)(NewGame);

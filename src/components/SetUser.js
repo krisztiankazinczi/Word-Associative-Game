@@ -55,15 +55,18 @@ const SetUser = ({ open, setOpen, classes }) => {
   const [userName, setUserName] = useState("");
   const [{username}, dispatch] = useStateValue();
 
+  // if username already selected, this dialog not needed, close automatically
   if (username) {
     setOpen(false)
   }
 
+  // save the username in store
   const saveName = () => {
     dispatch(setUser(userName));
     setOpen(false)
   };
 
+  // is player press 'enter' the typed username will be saved
   const handleSubmit = (e) => {
     if (e.key === 'Enter') {
       dispatch(setUser(userName));
@@ -72,7 +75,8 @@ const SetUser = ({ open, setOpen, classes }) => {
   }
 
   return (
-    <Dialog className={classes.dialog} open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+    // just a dialog with an input field and save and cancel button
+    <Dialog className={classes.dialog} open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm" disableBackdropClick disableEscapeKeyDown>
       <DialogTitle className={classes.dialogActions}>Please select your username:</DialogTitle>
       <DialogActions className={classes.dialogActions}>
         <div className={classes.inputContainer}>

@@ -1,5 +1,6 @@
 import React from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
+// clsx a Material UI package used for combining multiple classes on 1 component
 import clsx from "clsx";
 
 import CheckIcon from "@material-ui/icons/Check";
@@ -92,6 +93,7 @@ const ResultRow = ({
   classes,
 }) => {
   return (
+    // displays the actual user's question and selected answer conditionally. If the answer were correct than other styles will be applied then not
     <div className={classes.container}>
       <div
         className={clsx(
@@ -124,6 +126,7 @@ const ResultRow = ({
           ))}
         </div>
       </div>
+      {/* If the mode was multiPlayer, then we will see everyones answers under each quiz questions. Also the display styles depends on the correctness of the question */}
       {otherAnswers && (
         <div className={classes.answerContainer}>
           {Object.entries(otherAnswers).map(([username, answer], id) => (
@@ -149,4 +152,5 @@ const ResultRow = ({
   );
 };
 
+//connect to Material UI Theme Provider
 export default withStyles(styles)(ResultRow);

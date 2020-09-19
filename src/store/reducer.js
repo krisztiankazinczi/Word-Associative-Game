@@ -8,6 +8,14 @@ import {
   DELETE_DATA_FROM_STORE,
 } from "./action_types";
 
+/**
+ * @username {String} - selected name by the user
+ * @quiz {Object of Objects}
+ * @quizQuestions {Array of Objects} - quizQuestions: [{correct: 1 or 2, option: [string1, string2], quiz: [string3, string4, string5]}....]
+ * @currentQuestion {Number} - between 0 and 9
+ * @currentGameMode {Object of strings and dates}
+ */
+
 export const initialState = {
   username: "",
   quiz: {

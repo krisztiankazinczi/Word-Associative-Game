@@ -93,30 +93,35 @@ const styles = (theme) => ({
     textTransform: "capitalized",
   },
   countDown: {
-    color: theme.otherStyles.orangeColor.color
+    color: theme.otherStyles.orangeColor.color,
   },
   info: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  }
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 });
 
 const countDownInitialValue = (currentGameMode) => {
   if (currentGameMode.createdAt) {
+    //the logic to get the exact selected timelimit (because of the countDown on WaitingRoom we had an extra 4 sec waiting time)
     const now = Date.now();
-    const createdAtconverted = new Date(currentGameMode.createdAt)
-    const gameEnd = createdAtconverted.getTime() + (currentGameMode.timeLimit * 1000)
-    
-    const remainingTime = Math.floor((gameEnd - now) / 1000)
+    const createdAtconverted = new Date(currentGameMode.createdAt);
+    const countDownDifference =
+      currentGameMode.timeLimitWithWaitingTime - currentGameMode.timeLimit;
+    const gameEnd =
+      createdAtconverted.getTime() +
+      (currentGameMode.timeLimit + countDownDifference) * 1000;
+    // I use Math.floor because the server will collect the answers when the timelimit expires, so this Math.floor provides
+    // that the player's timer will expire a little bit sooner than the limit on the server
+    const remainingTime = Math.floor((gameEnd - now) / 1000);
     return remainingTime;
   }
   return null;
 };
 
-// const ENDPOINT = "http://localhost:3030";
-const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com"
-
+const ENDPOINT = "http://localhost:3030";
+// const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com"
 
 const Quiz = ({ classes }) => {
   const [
@@ -127,12 +132,15 @@ const Quiz = ({ classes }) => {
   const [finished, setFinished] = useState(false); // finished game in SinglePLayer mode or finished my game in multiPlayer mode
   const [multiFinished, setMultiFinished] = useState(false); // when server informs us, that everyone finished the game or the time limit passed
   const [submittedAnswers, setSubmittedAnswers] = useState(false);
-  const [countDown, setCountDown] = useState(countDownInitialValue(currentGameMode));
-  const [redirectToResults, setRedirectToResults] = useState(false)
+  // I need countDown functionality only in multiPlayer mode => a function calculate the timelimit or if it's sinlePlayer, then set the value to null
+  const [countDown, setCountDown] = useState(
+    countDownInitialValue(currentGameMode)
+  );
+  const [redirectToResults, setRedirectToResults] = useState(false);
 
   useEffect(() => {
     if (currentGameMode.gameMode === "singlePlayer") return;
-
+    // countDown starts at the first load
     const interval = setInterval(() => {
       setCountDown((countDown) => countDown - 1);
     }, 1000);
@@ -140,10 +148,10 @@ const Quiz = ({ classes }) => {
     const socket = socketIOClient(ENDPOINT);
 
     socket.emit("join-room", currentGameMode.roomId, username);
-
+    // listens to quiz-finished, which will triggered when everyone finished the game or the timeLimit expired
     socket.on("quiz-finished", (gameResult) => {
       dispatch(saveEveryonesAnswers(gameResult));
-      setRedirectToResults(true)
+      setRedirectToResults(true);
       // setMultiFinished(true);
     });
 
@@ -155,24 +163,26 @@ const Quiz = ({ classes }) => {
 
   useEffect(() => {
     if (currentGameMode.gameMode === "singlePlayer") return;
-      if (countDown === 0) {
-        const socket = socketIOClient(ENDPOINT);
-  
-        // socket.emit("join-room", currentGameMode.roomId, username);
-  
-        const myAnswers = collectAllAnswers(quiz.quizQuestions);
-        socket.emit(
-          "submit-answers",
-          currentGameMode.roomId,
-          username,
-          myAnswers
-        );
-        setSubmittedAnswers(true);
+    // submit all the answers what have if the timeLimit expires
+    if (countDown === 0) {
+      const socket = socketIOClient(ENDPOINT);
 
-        return () => socket.disconnect();
-      }
+      // socket.emit("join-room", currentGameMode.roomId, username);
+
+      const myAnswers = collectAllAnswers(quiz.quizQuestions);
+      socket.emit(
+        "submit-answers",
+        currentGameMode.roomId,
+        username,
+        myAnswers
+      );
+      setSubmittedAnswers(true);
+
+      return () => socket.disconnect();
+    }
   }, [countDown]);
 
+  //function change the state in the store when a question is answered
   const selectAnswer = (event) => {
     const questionNumber = parseInt(
       event.target.getAttribute("data-question-number")
@@ -192,9 +202,10 @@ const Quiz = ({ classes }) => {
   }
 
   if (redirectToResults) {
-    return <Redirect to="/result" />
+    return <Redirect to="/result" />;
   }
 
+  // this also submit all the answers to the server if the player press this button (it's possible only if every question is answered)
   const submitAnswersToServer = () => {
     const myAnswers = collectAllAnswers(quiz.quizQuestions);
     const socket = socketIOClient(ENDPOINT);
@@ -205,13 +216,16 @@ const Quiz = ({ classes }) => {
   return (
     <div className={classes.quiz}>
       <div className={classes.halfWidth}>
+        {/* if either single or multi game is finished, this will be rendered */}
         {(finished && currentGameMode.gameMode === "singlePlayer") ||
         multiFinished ? (
           <div className={classes.quizFinished}>
             <Link to="/result">Check Result</Link>
           </div>
         ) : finished && currentGameMode.gameMode === "multiPlayer" ? (
+          // if multiPlayer game finished this will be rendered
           <div className={classes.container}>
+            {/* if the player submit the answers to server, than the button will disappear and a text will appear */}
             {!submittedAnswers ? (
               <Button
                 variant="contained"
@@ -223,23 +237,27 @@ const Quiz = ({ classes }) => {
             ) : (
               <h3>Answers sent to server</h3>
             )}
+            {/* Spinner until the every player finish the game or the timelimit expires */}
             <h3>Waiting for other players....</h3>
             <Spinner />
           </div>
         ) : (
+          // Quiz Questions/Answers display one by one
           <div>
             <div className={classes.info}>
               <Typography variant="h3" className={classes.quizQuestionNumber}>
                 {currentQuestion + 1} / 10
               </Typography>
-              <Typography variant="h3" className={classes.countDown}>
-                {countDown} s
-              </Typography>
+              {currentGameMode.gameMode === "multiPlayer" && (
+                <Typography variant="h3" className={classes.countDown}>
+                  {countDown} s
+                </Typography>
+              )}
             </div>
             <h3 className={classes.quizInfo}>
               Select the most related word to the first 3 ones!
             </h3>
-            
+
             <div className={classes.quizWords}>
               {quiz.quizQuestions[currentQuestion].quiz.map((word, idx) => (
                 <h3 key={idx}>{word}</h3>
@@ -265,4 +283,5 @@ const Quiz = ({ classes }) => {
   );
 };
 
+//connect to Material UI Theme Provider
 export default withStyles(styles)(Quiz);
