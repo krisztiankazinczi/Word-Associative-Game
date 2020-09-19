@@ -14,9 +14,11 @@ import { useStateValue } from "../store/StateProvider";
 import { newGame, setGameMode } from "../store/actions";
 import { Typography } from "@material-ui/core";
 
-const ENDPOINT = "http://localhost:3030";
+// const ENDPOINT = "http://localhost:3030";
+const ENDPOINT = "https://word-associative-game-back-end.herokuapp.com"
 
 const url = "http://localhost:3000/room/";
+
 
 const styles = (theme) => ({
   ...theme.otherStyles,
