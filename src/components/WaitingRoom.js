@@ -16,7 +16,7 @@ import { Typography } from "@material-ui/core";
 
 import Spinner from "./Spinner";
 
-const ENDPOINT = process.env.REACT_APP_DEVELOPMENT_MODE ? 'http://localhost:3030' : process.env.REACT_APP_BACK_END_URL;
+const ENDPOINT = process.env.REACT_APP_DEVELOPMENT_MODE === 'true' ? 'http://localhost:3030' : process.env.REACT_APP_BACK_END_URL;
 
 
 const styles = (theme) => ({
