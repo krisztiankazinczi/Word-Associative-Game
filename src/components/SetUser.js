@@ -83,9 +83,10 @@ const SetUser = ({ open, setOpen, classes }) => {
           <Input className={`${classes.center} ${classes.inputColor}`} fullWidth color="secondary" type="text" value={userName} onKeyDown={(e) => handleSubmit(e)} onChange={(e) => setUserName(e.target.value)} />
         </div>
         <div className={`${classes.inputContainer} ${classes.marginTop}`}>
-          <Button className={classes.center} onClick={() => setOpen(false)} color="primary">
+          {/* <Button className={classes.center} onClick={() => setOpen(false)} color="primary">
             Cancel
-          </Button>
+          </Button> */}
+          <div className={classes.center}></div>
           <Button className={classes.center} onClick={saveName} color="secondary">
             Save
           </Button>

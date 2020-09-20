@@ -150,8 +150,8 @@ const Quiz = ({ classes }) => {
     // listens to quiz-finished, which will triggered when everyone finished the game or the timeLimit expired
     socket.on("quiz-finished", (gameResult) => {
       dispatch(saveEveryonesAnswers(gameResult));
+      setMultiFinished(true);
       setRedirectToResults(true);
-      // setMultiFinished(true);
     });
 
     return () => {
@@ -200,9 +200,9 @@ const Quiz = ({ classes }) => {
     return <Redirect to="/" />;
   }
 
-  if (redirectToResults) {
-    return <Redirect to="/result" />;
-  }
+  // if (redirectToResults) {
+  //   return <Redirect to="/result" />;
+  // }
 
   // this also submit all the answers to the server if the player press this button (it's possible only if every question is answered)
   const submitAnswersToServer = () => {
@@ -258,7 +258,9 @@ const Quiz = ({ classes }) => {
             </h3>
 
             <div className={classes.quizWords}>
-              {quiz.quizQuestions[currentQuestion].quiz.map((word, idx) => (
+              {quiz
+                .quizQuestions[currentQuestion]
+                .quiz.map((word, idx) => (
                 <h3 key={idx}>{word}</h3>
               ))}
             </div>

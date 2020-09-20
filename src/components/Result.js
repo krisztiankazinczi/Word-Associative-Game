@@ -59,9 +59,9 @@ function Result({ classes }) {
     };
   });
 
-  if (!quiz?.quizQuestions || !isGameFinished(quiz?.quizQuestions)) {
-    return <Redirect to="/quiz" />;
-  }
+  // if (!quiz?.quizQuestions || !isGameFinished(quiz?.quizQuestions)) {
+  //   return <Redirect to="/quiz" />;
+  // }
 
   return (
     <div className={classes.result}>
